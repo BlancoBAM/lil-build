@@ -2,7 +2,7 @@
     "distro_name": "Lilith Linux",
     "base_ubuntu_codename": "resolute",
     "repo_url": "https://packages.lilithlinux.org",
-    "generated": "2026-05-22T03:12:38.934859Z",
+    "generated": "2026-05-22T03:24:48.710016Z",
     "custom_repository_overlay": {
         "name": "Lilith Custom Repo",
         "url": "https://packages.lilithlinux.org/",

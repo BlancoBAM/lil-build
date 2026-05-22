@@ -33,7 +33,7 @@ CORE_FILE = os.path.join(LIL_BUILD, "pkgs/lil-core.txt")
 XTRA_FILE = os.path.join(LIL_BUILD, "xtra-pks.txt")
 UBUNTU_LIST = os.path.join(LIL_BUILD, "ubuntu-26.04-desktop-amd64.list")
 MANIFEST_OUT = os.path.join(REPO_ROOT, "lilith-distro-manifest.json")
-MAINTAINER = "Lilith Linux Developer <packages@lilithlinux.org>"
+MAINTAINER = "BlancoBAM <blancobam@protonmail.com>"
 REPO_URL = "https://packages.lilithlinux.org"
 
 print("=== Lilith Linux Repository Builder ===")
@@ -76,16 +76,27 @@ def init_dirs():
 # ── DEB redirect (point apt to upstream URL) ──────────────────────────────────
 def get_deb_metadata(url, pkg_name):
     """Download a .deb from url and extract its metadata for the Packages index."""
+    cache_dir = "/home/aegon/lil-build/deb-cache"
+    os.makedirs(cache_dir, exist_ok=True)
+    cache_path = os.path.join(cache_dir, f"{pkg_name}.deb")
+
     temp_dir = "/tmp/lilith-deb-temp"
     os.makedirs(temp_dir, exist_ok=True)
     deb_path = os.path.join(temp_dir, f"{pkg_name}.deb")
 
     print(f"  [*] Fetching metadata for {pkg_name}...")
-    try:
-        urllib.request.urlretrieve(url, deb_path)
-    except Exception as e:
-        print(f"  [-] Download failed for {url}: {e}")
-        return None
+    if os.path.exists(cache_path):
+        print(f"    [+] Using cached DEB: {cache_path}")
+        shutil.copy2(cache_path, deb_path)
+    else:
+        try:
+            urllib.request.urlretrieve(url, deb_path)
+            # Cache it for future runs
+            shutil.copy2(deb_path, cache_path)
+            print(f"    [+] Cached DEB to: {cache_path}")
+        except Exception as e:
+            print(f"  [-] Download failed for {url}: {e}")
+            return None
 
     size = os.path.getsize(deb_path)
     sha256 = get_sha256(deb_path)
@@ -221,13 +232,13 @@ def build_repo_indexes(packages_by_comp):
         f.write(main_release)
 
     # Sign the Release file
-    print("[*] Signing Release file with GPG key (packages@lilithlinux.org)...")
+    print("[*] Signing Release file with GPG key (blancobam@protonmail.com)...")
     inrelease_path = os.path.join(REPO_ROOT, "dists/stable/InRelease")
     release_gpg_path = os.path.join(REPO_ROOT, "dists/stable/Release.gpg")
     
     # Generate InRelease (clearsigned) and Release.gpg (detached signature)
-    run_cmd(f"gpg --batch --yes --clearsign --default-key packages@lilithlinux.org -o {inrelease_path} {release_path}")
-    run_cmd(f"gpg --batch --yes -abs --default-key packages@lilithlinux.org -o {release_gpg_path} {release_path}")
+    run_cmd(f"gpg --batch --yes --clearsign --default-key blancobam@protonmail.com -o {inrelease_path} {release_path}")
+    run_cmd(f"gpg --batch --yes -abs --default-key blancobam@protonmail.com -o {release_gpg_path} {release_path}")
 
     print("[+] Repository index files generated and signed successfully!")
 

@@ -7,8 +7,8 @@
 # =============================================================================
 set -euo pipefail
 
-KEY_EMAIL="packages@lilithlinux.org"
-KEY_NAME="Lilith Linux Developer"
+KEY_EMAIL="blancobam@protonmail.com"
+KEY_NAME="BlancoBAM"
 LIL_BUILD="/home/aegon/lil-build"
 REPO_ROOT="${LIL_BUILD}/Lilith-Repo"
 
