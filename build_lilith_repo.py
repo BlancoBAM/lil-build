@@ -1,455 +1,1083 @@
 #!/usr/bin/env python3
+# =============================================================================
+# Lilith Linux Repository Builder
+# =============================================================================
+# Builds all wrapper .deb packages and regenerates the apt Packages/Release
+# indexes for the Lilith Linux custom overlay repository.
+#
+# Usage:
+#   python3 /home/aegon/lil-build/build_lilith_repo.py
+#
+# Output: /home/aegon/lil-build/Lilith-Repo/
+#   pool/main/*.deb
+#   pool/xtra/*.deb
+#   dists/stable/{main,xtra}/binary-amd64/Packages{,.gz}
+#   dists/stable/Release
+#   lilith-distro-manifest.json
+# =============================================================================
+
 import os
 import sys
 import shutil
 import urllib.request
+import urllib.error
 import hashlib
 import subprocess
 import json
+import datetime
 
-# Paths
-REPO_ROOT = "/home/aegon/Lilith-Repo"
+# ── Paths ─────────────────────────────────────────────────────────────────────
+REPO_ROOT = "/home/aegon/lil-build/Lilith-Repo"
 LIL_BUILD = "/home/aegon/lil-build"
 CORE_FILE = os.path.join(LIL_BUILD, "pkgs/lil-core.txt")
 XTRA_FILE = os.path.join(LIL_BUILD, "xtra-pks.txt")
 UBUNTU_LIST = os.path.join(LIL_BUILD, "ubuntu-26.04-desktop-amd64.list")
 MANIFEST_OUT = os.path.join(REPO_ROOT, "lilith-distro-manifest.json")
+MAINTAINER = "Lilith Linux Developer <packages@lilithlinux.org>"
+REPO_URL = "https://packages.lilithlinux.org"
 
-print("=== Starting Lilith Linux Repo Builder ===")
+print("=== Lilith Linux Repository Builder ===")
+print(f"Output: {REPO_ROOT}")
 
-# Create directory structure
+# ── Helpers ───────────────────────────────────────────────────────────────────
+def get_sha256(filepath):
+    h = hashlib.sha256()
+    with open(filepath, 'rb') as f:
+        for chunk in iter(lambda: f.read(65536), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+def run_cmd(cmd, cwd=None, check=False):
+    res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd)
+    if res.returncode != 0:
+        if check:
+            print(f"  [-] Command failed: {cmd}\n  Error: {res.stderr.strip()}")
+        return None
+    return res.stdout
+
+def download_file(url, dest, label=""):
+    label = label or os.path.basename(dest)
+    try:
+        print(f"  [*] Downloading {label}...", end=" ", flush=True)
+        urllib.request.urlretrieve(url, dest)
+        size_mb = os.path.getsize(dest) / 1024 / 1024
+        print(f"OK ({size_mb:.1f} MB)")
+        return True
+    except Exception as e:
+        print(f"FAILED: {e}")
+        return False
+
 def init_dirs():
     for comp in ["main", "xtra"]:
         os.makedirs(os.path.join(REPO_ROOT, "dists/stable", comp, "binary-amd64"), exist_ok=True)
         os.makedirs(os.path.join(REPO_ROOT, "pool", comp), exist_ok=True)
-    print("[+] Repository directory structure created")
+    print("[+] Repository directory structure ready")
 
-# Helper to calculate SHA256
-def get_sha256(filepath):
-    h = hashlib.sha256()
-    with open(filepath, 'rb') as file:
-        while True:
-            chunk = file.read(65536)
-            if not chunk:
-                break
-            h.update(chunk)
-    return h.hexdigest()
-
-# Helper to run shell commands
-def run_cmd(cmd, cwd=None):
-    res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd)
-    if res.returncode != 0:
-        print(f"[-] Command failed: {cmd}\nError: {res.stderr}")
-        return None
-    return res.stdout
-
-# Temporary download and extract control metadata
+# ── DEB redirect (point apt to upstream URL) ──────────────────────────────────
 def get_deb_metadata(url, pkg_name):
+    """Download a .deb from url and extract its metadata for the Packages index."""
     temp_dir = "/tmp/lilith-deb-temp"
     os.makedirs(temp_dir, exist_ok=True)
     deb_path = os.path.join(temp_dir, f"{pkg_name}.deb")
-    
-    print(f"[*] Downloading {pkg_name} from {url}...")
+
+    print(f"  [*] Fetching metadata for {pkg_name}...")
     try:
         urllib.request.urlretrieve(url, deb_path)
     except Exception as e:
-        print(f"[-] Failed to download {url}: {e}")
+        print(f"  [-] Download failed for {url}: {e}")
         return None
-        
+
     size = os.path.getsize(deb_path)
     sha256 = get_sha256(deb_path)
-    
-    # Extract control info
     control_out = run_cmd(f"dpkg-deb -I {deb_path}")
     os.remove(deb_path)
-    
-    if not control_out:
-        return None
-        
-    metadata = {}
-    for line in control_out.splitlines():
-        line = line.strip()
-        if line.startswith("Package:"):
-            metadata["Package"] = line.split(":", 1)[1].strip()
-        elif line.startswith("Version:"):
-            metadata["Version"] = line.split(":", 1)[1].strip()
-        elif line.startswith("Architecture:"):
-            metadata["Architecture"] = line.split(":", 1)[1].strip()
-        elif line.startswith("Depends:"):
-            metadata["Depends"] = line.split(":", 1)[1].strip()
-        elif line.startswith("Description:"):
-            metadata["Description"] = line.split(":", 1)[1].strip()
-        elif line.startswith("Maintainer:"):
-            metadata["Maintainer"] = line.split(":", 1)[1].strip()
-            
-    metadata["Size"] = str(size)
-    metadata["SHA256"] = sha256
-    metadata["Filename"] = url  # Absolute Redirect URL!
-    
-    # Defaults if missing
-    if "Package" not in metadata: metadata["Package"] = pkg_name
-    if "Version" not in metadata: metadata["Version"] = "1.0.0"
-    if "Architecture" not in metadata: metadata["Architecture"] = "amd64"
-    if "Description" not in metadata: metadata["Description"] = "Lilith Linux package redirect"
-    
+
+    metadata = {
+        "Package": pkg_name, "Version": "1.0.0",
+        "Architecture": "amd64", "Maintainer": MAINTAINER,
+        "Description": f"{pkg_name} — Lilith Linux package redirect",
+        "Size": str(size), "SHA256": sha256,
+        "Filename": url,  # apt will redirect to this URL
+    }
+    if control_out:
+        for line in control_out.splitlines():
+            line = line.strip()
+            for field in ("Package", "Version", "Architecture", "Maintainer", "Description", "Depends"):
+                if line.startswith(f"{field}:"):
+                    metadata[field] = line.split(":", 1)[1].strip()
+
+    print(f"    Package={metadata['Package']} Version={metadata['Version']}")
     return metadata
 
-# Generate a tiny wrapper package
-def build_wrapper_deb(pkg_name, version, desc, postinst_script, component="main"):
+# ── Wrapper deb builder ────────────────────────────────────────────────────────
+def build_wrapper_deb(pkg_name, version, desc, postinst_script,
+                      component="main", depends=None, preinst=None):
+    """Build a minimal wrapper .deb with a postinst that downloads/installs the tool."""
     build_dir = f"/tmp/lilith-wrapper-{pkg_name}"
+    shutil.rmtree(build_dir, ignore_errors=True)
     os.makedirs(os.path.join(build_dir, "DEBIAN"), exist_ok=True)
-    
-    # Write control file
-    control_content = f"""Package: {pkg_name}
-Version: {version}
-Section: misc
-Priority: optional
-Architecture: amd64
-Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: {desc} (Wrapper Package)
-"""
+
+    depends_str = f"\nDepends: {depends}" if depends else ""
+    control = (
+        f"Package: {pkg_name}\nVersion: {version}\nSection: misc\n"
+        f"Priority: optional\nArchitecture: amd64\nMaintainer: {MAINTAINER}\n"
+        f"Description: {desc}{depends_str}\n"
+    )
     with open(os.path.join(build_dir, "DEBIAN/control"), "w") as f:
-        f.write(control_content)
-        
-    # Write postinst script
+        f.write(control)
+
+    postinst_content = "#!/bin/bash\nset -e\n" + postinst_script + "\nexit 0\n"
     with open(os.path.join(build_dir, "DEBIAN/postinst"), "w") as f:
-        f.write("#!/bin/bash\nset -e\n" + postinst_script + "\nexit 0\n")
-        
+        f.write(postinst_content)
     os.chmod(os.path.join(build_dir, "DEBIAN/postinst"), 0o755)
-    
-    # Build the package
+
+    if preinst:
+        with open(os.path.join(build_dir, "DEBIAN/preinst"), "w") as f:
+            f.write("#!/bin/bash\nset -e\n" + preinst + "\nexit 0\n")
+        os.chmod(os.path.join(build_dir, "DEBIAN/preinst"), 0o755)
+
     output_pool = os.path.join(REPO_ROOT, "pool", component)
     os.makedirs(output_pool, exist_ok=True)
     deb_out_path = os.path.join(output_pool, f"{pkg_name}_{version}_amd64.deb")
-    
-    print(f"[*] Building wrapper DEB for {pkg_name}...")
-    run_cmd(f"dpkg-deb --build {build_dir} {deb_out_path}")
-    shutil.rmtree(build_dir)
-    
-    # Return package metadata block for Packages index
+
+    print(f"  [*] Building wrapper deb: {pkg_name}_{version}_amd64.deb")
+    run_cmd(f"dpkg-deb --build {build_dir} {deb_out_path}", check=True)
+    shutil.rmtree(build_dir, ignore_errors=True)
+
     size = os.path.getsize(deb_out_path)
     sha256 = get_sha256(deb_out_path)
-    
-    # Filename will be relative for hosted wrapper packages
     rel_filename = f"pool/{component}/{pkg_name}_{version}_amd64.deb"
-    
-    metadata = {
-        "Package": pkg_name,
-        "Version": version,
-        "Architecture": "amd64",
-        "Description": f"{desc} (Wrapper)",
-        "Maintainer": "Lilith Linux Developer <packages@lilithlinux.org>",
-        "Size": str(size),
-        "SHA256": sha256,
-        "Filename": rel_filename
-    }
-    return metadata
 
+    return {
+        "Package": pkg_name, "Version": version,
+        "Architecture": "amd64", "Maintainer": MAINTAINER,
+        "Description": f"{desc} (Lilith Wrapper)",
+        "Size": str(size), "SHA256": sha256, "Filename": rel_filename,
+        **({"Depends": depends} if depends else {}),
+    }
+
+# ── Index builder ─────────────────────────────────────────────────────────────
 def build_repo_indexes(packages_by_comp):
-    print("[*] Generating Packages.gz and Release files...")
-    
+    print("\n[*] Generating Packages indexes and Release files...")
+    now = datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S UTC")
+    sha256_lines = []
+
     for comp, pkgs in packages_by_comp.items():
         comp_dir = os.path.join(REPO_ROOT, f"dists/stable/{comp}/binary-amd64")
-        packages_txt_path = os.path.join(comp_dir, "Packages")
-        
-        with open(packages_txt_path, "w") as f:
+        packages_path = os.path.join(comp_dir, "Packages")
+
+        with open(packages_path, "w") as f:
             for pkg in pkgs:
-                block = f"""Package: {pkg['Package']}
-Version: {pkg['Version']}
-Architecture: {pkg['Architecture']}
-Filename: {pkg['Filename']}
-Size: {pkg['Size']}
-SHA256: {pkg['SHA256']}
-Maintainer: {pkg.get('Maintainer', 'Lilith Developer')}
-Description: {pkg['Description']}"""
-                if 'Depends' in pkg:
-                    block += f"\nDepends: {pkg['Depends']}"
-                block += "\n\n"
+                block = (
+                    f"Package: {pkg['Package']}\n"
+                    f"Version: {pkg['Version']}\n"
+                    f"Architecture: {pkg['Architecture']}\n"
+                    f"Filename: {pkg['Filename']}\n"
+                    f"Size: {pkg['Size']}\n"
+                    f"SHA256: {pkg['SHA256']}\n"
+                    f"Maintainer: {pkg.get('Maintainer', MAINTAINER)}\n"
+                    f"Description: {pkg['Description']}\n"
+                )
+                if "Depends" in pkg:
+                    block += f"Depends: {pkg['Depends']}\n"
+                block += "\n"
                 f.write(block)
-                
-        # Compress Packages to Packages.gz
-        run_cmd(f"gzip -fk {packages_txt_path}")
-        
-        # Component Release file
-        comp_release_content = f"""Origin: Lilith Linux
-Label: Lilith Linux {comp.capitalize()}
-Suite: stable
-Version: 1.0.0
-Component: {comp}
-Architecture: amd64
-Description: Lilith Linux {comp.capitalize()} Redirect Packages
-"""
+
+        run_cmd(f"gzip -fk {packages_path}")
+
+        # Component Release
         with open(os.path.join(REPO_ROOT, f"dists/stable/{comp}/Release"), "w") as f:
-            f.write(comp_release_content)
-            
+            f.write(
+                f"Origin: Lilith Linux\nLabel: Lilith Linux {comp.capitalize()}\n"
+                f"Suite: stable\nVersion: 1.0.0\nComponent: {comp}\n"
+                f"Architecture: amd64\n"
+                f"Description: Lilith Linux {comp.capitalize()} overlay packages\n"
+            )
+
+        # Accumulate checksums for main Release
+        for fname in ["Packages", "Packages.gz"]:
+            fpath = os.path.join(comp_dir, fname)
+            if os.path.exists(fpath):
+                sha256_lines.append(
+                    f" {get_sha256(fpath)} {os.path.getsize(fpath)}"
+                    f" {comp}/binary-amd64/{fname}"
+                )
+
     # Main Release file
-    main_release_content = f"""Origin: Lilith Linux
-Label: Lilith Linux Overlay
-Suite: stable
-Codename: stable
-Date: Mon, 18 May 2026 04:20:00 UTC
-Architectures: amd64
-Components: main xtra
-Description: Thin package overlay for Lilith Linux
-SHA256:
-"""
-    # Calculate checksums for Packages.gz
-    for comp in ["main", "xtra"]:
-        pkg_gz_path = os.path.join(REPO_ROOT, f"dists/stable/{comp}/binary-amd64/Packages.gz")
-        if os.path.exists(pkg_gz_path):
-            size = os.path.getsize(pkg_gz_path)
-            sha256 = get_sha256(pkg_gz_path)
-            main_release_content += f" {sha256} {size} {comp}/binary-amd64/Packages.gz\n"
-            
-        pkg_path = os.path.join(REPO_ROOT, f"dists/stable/{comp}/binary-amd64/Packages")
-        if os.path.exists(pkg_path):
-            size = os.path.getsize(pkg_path)
-            sha256 = get_sha256(pkg_path)
-            main_release_content += f" {sha256} {size} {comp}/binary-amd64/Packages\n"
+    main_release = (
+        f"Origin: Lilith Linux\n"
+        f"Label: Lilith Linux Overlay\n"
+        f"Suite: stable\n"
+        f"Codename: stable\n"
+        f"Date: {now}\n"
+        f"Architectures: amd64\n"
+        f"Components: main xtra\n"
+        f"Description: Thin package overlay for Lilith Linux (Ubuntu Resolute base)\n"
+        f"SHA256:\n"
+    ) + "\n".join(sha256_lines) + "\n"
 
-    with open(os.path.join(REPO_ROOT, "dists/stable/Release"), "w") as f:
-        f.write(main_release_content)
-        
-    print("[+] Repository index files generated successfully!")
+    release_path = os.path.join(REPO_ROOT, "dists/stable/Release")
+    with open(release_path, "w") as f:
+        f.write(main_release)
 
-# Parse the lists and populate repository
+    # Sign the Release file
+    print("[*] Signing Release file with GPG key (packages@lilithlinux.org)...")
+    inrelease_path = os.path.join(REPO_ROOT, "dists/stable/InRelease")
+    release_gpg_path = os.path.join(REPO_ROOT, "dists/stable/Release.gpg")
+    
+    # Generate InRelease (clearsigned) and Release.gpg (detached signature)
+    run_cmd(f"gpg --batch --yes --clearsign --default-key packages@lilithlinux.org -o {inrelease_path} {release_path}")
+    run_cmd(f"gpg --batch --yes -abs --default-key packages@lilithlinux.org -o {release_gpg_path} {release_path}")
+
+    print("[+] Repository index files generated and signed successfully!")
+
+# =============================================================================
+# MAIN
+# =============================================================================
 def main():
     init_dirs()
-    
     packages_by_comp = {"main": [], "xtra": []}
-    
-    # 1. Custom core apps from lil-core.txt (main component)
-    # Define DEB redirects
+
+    # ────────────────────────────────────────────────────────────────────────
+    # MAIN COMPONENT — DEB REDIRECTS
+    # ────────────────────────────────────────────────────────────────────────
+    print("\n── DEB Redirects ──")
     deb_redirects = [
-        ("offerings", "https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.0.2-beta-1_amd64.deb"),
-        ("tweakers", "https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb"),
-        ("lilim", "https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb"),
-        ("stake", "https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb"),
-        ("ouija-pad", "https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb"),
-        ("topgrade", "https://github.com/topgrade-rs/topgrade/releases/download/v17.5.0/topgrade_17.5.0_amd64.deb"),
-        ("lsd", "https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd_1.2.0_amd64.deb"),
-        ("zoxide", "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb"),
-        ("bat", "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat_0.26.1_amd64.deb")
+        ("offerings",  "https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.0.2-beta-1_amd64.deb"),
+        ("tweakers",   "https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb"),
+        ("lilim",      "https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb"),
+        ("stake",      "https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb"),
+        ("ouija-pad",  "https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb"),
+        ("topgrade",   "https://github.com/topgrade-rs/topgrade/releases/download/v17.5.0/topgrade_17.5.0_amd64.deb"),
+        ("lsd",        "https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd_1.2.0_amd64.deb"),
+        ("zoxide",     "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb"),
+        ("bat",        "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat_0.26.1_amd64.deb"),
     ]
-    
     for name, url in deb_redirects:
         meta = get_deb_metadata(url, name)
         if meta:
             packages_by_comp["main"].append(meta)
-            
-    # Define wrapper debs for AppImages and git builds
-    # s8n system CLI wrapper
-    s8n_script = """
-echo "Downloading s8n-system binary..."
+
+    # ────────────────────────────────────────────────────────────────────────
+    # MAIN COMPONENT — WRAPPER DEBS
+    # ────────────────────────────────────────────────────────────────────────
+    print("\n── Wrapper DEBs ──")
+
+    # s8n — CLI system manager
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "s8n-system", "0.1.3",
+        "Lilith System Package Manager CLI (s8n)",
+        """
+echo "[s8n-system] Installing s8n binary..."
 mkdir -p /usr/local/bin
-curl -sSL -o /usr/local/bin/s8n https://github.com/BlancoBAM/S8n-System/releases/download/v0.1.3/s8n-linux-amd64
+curl -fsSL -o /usr/local/bin/s8n https://github.com/BlancoBAM/S8n-System/releases/download/v0.1.3/s8n-linux-amd64
 chmod +x /usr/local/bin/s8n
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("s8n-system", "0.1.3", "Lilith System Package Manager CLI wrapper", s8n_script))
+s8n --version 2>/dev/null && echo "[s8n-system] s8n installed OK" || true
+""",
+        depends="curl"
+    ))
+
+    # HellFire Browser — download tar.xz, install to /opt/hellfire
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "hellfire", "152.0a1",
+        "HellFire Browser — privacy-focused custom Firefox for Lilith Linux",
+        r"""
+set -e
+HELLFIRE_URL="https://github.com/CYFARE/HellFire/releases/download/v152.0a1_FP2/hellfire-152.0a1.en-US.linux-x86_64.tar.xz"
+HELLFIRE_INSTALLER_URL="https://github.com/CYFARE/HellFire/releases/download/v152.0a1_FP2/linux_installer.py"
+INSTALL_DIR="/opt/hellfire"
+TARBALL="/tmp/hellfire-152.0a1.tar.xz"
+
+echo "[hellfire] Installing HellFire Browser v152.0a1..."
+
+# Skip if already installed
+if [[ -f "$INSTALL_DIR/firefox" ]]; then
+    echo "[hellfire] Already installed at $INSTALL_DIR"
+else
+    echo "[hellfire] Downloading from GitHub Releases (~100 MB)..."
+    curl -fsSL -o "$TARBALL" "$HELLFIRE_URL"
+    mkdir -p "$INSTALL_DIR"
+    tar -xJf "$TARBALL" --strip-components=1 -C "$INSTALL_DIR"
+    rm -f "$TARBALL"
+fi
+
+# Symlink
+ln -sf "$INSTALL_DIR/firefox" /usr/local/bin/hellfire
+
+# Icon
+ICON_SRC="$INSTALL_DIR/browser/chrome/icons/default/default128.png"
+if [[ -f "$ICON_SRC" ]]; then
+    mkdir -p /usr/share/icons/hicolor/128x128/apps
+    cp "$ICON_SRC" /usr/share/icons/hicolor/128x128/apps/hellfire.png
+fi
+
+# Desktop entry
+mkdir -p /usr/share/applications
+cat > /usr/share/applications/hellfire.desktop << 'DESKTOP'
+[Desktop Entry]
+Name=HellFire Browser
+GenericName=Web Browser
+Comment=Custom-compiled Firefox for Lilith Linux — privacy and performance optimized
+Exec=/opt/hellfire/firefox %u
+Icon=hellfire
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true
+StartupWMClass=firefox
+Actions=new-window;new-private-window;
+[Desktop Action new-window]
+Name=New Window
+Exec=/opt/hellfire/firefox --new-window %u
+[Desktop Action new-private-window]
+Name=New Private Window
+Exec=/opt/hellfire/firefox --private-window %u
+DESKTOP
+
+# Cache installer for future per-user updates
+curl -fsSL -o "$INSTALL_DIR/linux_installer.py" "$HELLFIRE_INSTALLER_URL" 2>/dev/null || true
+
+# Update helper script
+cat > /usr/local/bin/hellfire-update << 'HELPER'
+#!/bin/bash
+# HellFire update helper — runs the GUI installer
+python3 /opt/hellfire/linux_installer.py 2>/dev/null || \
+  python3 <(curl -fsSL https://github.com/CYFARE/HellFire/releases/latest/download/linux_installer.py)
+HELPER
+chmod 755 /usr/local/bin/hellfire-update
+
+echo "[hellfire] HellFire Browser installation complete."
+""",
+        depends="curl, libfuse2t64"
+    ))
 
     # BrowserOS AppImage
-    browseros_script = """
-echo "Downloading BrowserOS AppImage..."
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "browseros", "0.42.0.1",
+        "Lilith Default Web Browser OS AppImage",
+        """
+echo "[browseros] Installing BrowserOS AppImage..."
 mkdir -p /opt/browseros
-curl -sSL -o /opt/browseros/BrowserOS.AppImage https://github.com/BlancoBAM/Lilith-Linux/raw/main/BrowserOS_v0.42.0.1_x64.AppImage
+curl -fsSL -o /opt/browseros/BrowserOS.AppImage \
+    https://github.com/BlancoBAM/Lilith-Linux/raw/main/BrowserOS_v0.42.0.1_x64.AppImage
 chmod +x /opt/browseros/BrowserOS.AppImage
 ln -sf /opt/browseros/BrowserOS.AppImage /usr/local/bin/browseros
-
-# Create desktop entry
 mkdir -p /usr/share/applications
 cat > /usr/share/applications/browseros.desktop << 'EOF'
 [Desktop Entry]
 Name=BrowserOS
 Comment=Lilith Linux Default Web Browser OS
-Exec=browseros
+Exec=/usr/local/bin/browseros %U
 Icon=web-browser
 Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
 EOF
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("browseros", "0.42.0", "Lilith Default Web Browser OS AppImage", browseros_script))
+echo "[browseros] BrowserOS installed."
+""",
+        depends="curl, libfuse2t64"
+    ))
 
-    # Hyper Terminal AppImage wrapper
-    hyper_script = """
-echo "Downloading Hyper terminal AppImage..."
+    # Hyper Terminal AppImage
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "hyper-terminal", "3.4.1",
+        "Hyper terminal emulator for Lilith Linux",
+        """
+echo "[hyper-terminal] Installing Hyper AppImage..."
 mkdir -p /opt/hyper
-curl -sSL -o /opt/hyper/Hyper.AppImage https://github.com/BlancoBAM/Lilith-Linux/raw/main/Hyper-3.4.1.AppImage
+curl -fsSL -o /opt/hyper/Hyper.AppImage \
+    https://github.com/BlancoBAM/Lilith-Linux/raw/main/Hyper-3.4.1.AppImage
 chmod +x /opt/hyper/Hyper.AppImage
 ln -sf /opt/hyper/Hyper.AppImage /usr/local/bin/hyper
-
-# Create desktop entry
 mkdir -p /usr/share/applications
 cat > /usr/share/applications/hyper.desktop << 'EOF'
 [Desktop Entry]
 Name=Hyper
-Comment=Default Terminal of Lilith Linux
-Exec=hyper
+Comment=Lilith Linux Default Terminal Emulator
+Exec=/usr/local/bin/hyper
 Icon=terminal
 Terminal=false
 Type=Application
 Categories=System;TerminalEmulator;
 EOF
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("hyper-terminal", "3.4.1", "Hyper terminal emulator for Lilith Linux", hyper_script))
+echo "[hyper-terminal] Hyper terminal installed."
+""",
+        depends="curl, libfuse2t64"
+    ))
 
     # Vicinae AppImage
-    vicinae_script = """
-echo "Downloading Vicinae AppImage..."
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "vicinae", "0.21.0",
+        "Vicinae Visual Workspace AppImage",
+        """
+echo "[vicinae] Installing Vicinae AppImage..."
 mkdir -p /opt/vicinae
-curl -sSL -o /opt/vicinae/Vicinae.AppImage https://github.com/vicinaehq/vicinae/releases/download/v0.21.0/Vicinae-x86_64.AppImage
+curl -fsSL -o /opt/vicinae/Vicinae.AppImage \
+    https://github.com/vicinaehq/vicinae/releases/download/v0.21.0/Vicinae-x86_64.AppImage
 chmod +x /opt/vicinae/Vicinae.AppImage
 ln -sf /opt/vicinae/Vicinae.AppImage /usr/local/bin/vicinae
-
-# Create desktop entry
 mkdir -p /usr/share/applications
 cat > /usr/share/applications/vicinae.desktop << 'EOF'
 [Desktop Entry]
 Name=Vicinae
-Comment=Curated visual workspace
-Exec=vicinae
+Comment=Curated visual workspace environment
+Exec=/usr/local/bin/vicinae
 Icon=workspace
 Terminal=false
 Type=Application
 Categories=Utility;
 EOF
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("vicinae", "0.21.0", "Vicinae Visual Workspace AppImage", vicinae_script))
+echo "[vicinae] Vicinae installed."
+""",
+        depends="curl, libfuse2t64"
+    ))
 
-    # Lilith-TTS Git Repo
-    tts_script = """
-echo "Cloning and building Lilith-TTS..."
-cd /tmp
-git clone https://github.com/BlancoBAM/Lilith-TTS.git
-cd Lilith-TTS
-if command -v cargo &> /dev/null; then
-    cargo build --release
-    cp target/release/lilith-tts /usr/local/bin/
+    # Lilith-TTS
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "lilith-tts", "1.0.0",
+        "Lilith Linux Text-to-Speech Engine",
+        """
+echo "[lilith-tts] Building Lilith-TTS from source..."
+DEST="/usr/local/bin/lilith-tts"
+if [[ -f "$DEST" ]]; then
+    echo "[lilith-tts] Already installed."
 else
-    echo "Cargo not found, skipping compile"
+    if command -v cargo &>/dev/null; then
+        cd /tmp
+        rm -rf Lilith-TTS
+        git clone https://github.com/BlancoBAM/Lilith-TTS.git
+        cd Lilith-TTS
+        cargo build --release 2>&1 | tail -5
+        cp target/release/lilith-tts-daemon "$DEST" || cp target/release/lilith-tts "$DEST" || true
+        chmod 755 "$DEST" || true
+    else
+        echo "[lilith-tts] cargo not found — skipping compile. Install Rust first."
+    fi
 fi
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("lilith-tts", "1.0.0", "Text-to-Speech Engine", tts_script))
+""",
+        depends="git, curl"
+    ))
 
-    # HellFire Git Repo
-    hellfire_script = """
-echo "Cloning and installing HellFire..."
-cd /tmp
-git clone https://github.com/CYFARE/HellFire.git
-cd HellFire
-if command -v cargo &> /dev/null; then
-    cargo build --release
-    cp target/release/hellfire /usr/local/bin/ || cp target/release/hell-fire /usr/local/bin/ || true
+    # nushell
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "nushell", "0.103.0",
+        "Nu shell — structured data shell written in Rust",
+        """
+echo "[nushell] Installing nushell..."
+if command -v apt-get &>/dev/null; then
+    apt-get install -y --no-install-recommends nushell 2>/dev/null && exit 0 || true
 fi
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("hellfire", "1.0.0", "HellFire Distro Tool", hellfire_script))
+NU_URL=$(curl -fsSL https://api.github.com/repos/nushell/nushell/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'x86_64-unknown-linux-musl' in a['name'] and a['name'].endswith('.tar.gz'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$NU_URL" ]]; then
+    TMPD=$(mktemp -d)
+    curl -fsSL -o "$TMPD/nu.tar.gz" "$NU_URL"
+    tar -xzf "$TMPD/nu.tar.gz" -C "$TMPD"
+    NU_BIN=$(find "$TMPD" -name "nu" -type f | head -1)
+    [[ -n "$NU_BIN" ]] && cp "$NU_BIN" /usr/local/bin/nu && chmod 755 /usr/local/bin/nu
+    rm -rf "$TMPD"
+    echo "[nushell] nu installed."
+fi
+""",
+        depends="curl, python3"
+    ))
 
-    # Soar Package Manager
-    soar_script = """
-echo "Installing soar..."
-curl -fsSL "https://raw.githubusercontent.com/pkgforge/soar/main/install.sh" | sh
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("soar", "1.0.0", "Soar Package Manager wrapper", soar_script))
+    # fd (find replacement)
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "fd-lilith", "10.2.0",
+        "fd — fast and user-friendly find alternative (Lilith binary edition)",
+        """
+echo "[fd] Installing fd binary (direct, avoids fd-find conflict)..."
+FD_URL=$(curl -fsSL https://api.github.com/repos/sharkdp/fd/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'x86_64-unknown-linux-musl' in a['name'] and a['name'].endswith('.tar.gz'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$FD_URL" ]]; then
+    TMPD=$(mktemp -d)
+    curl -fsSL -o "$TMPD/fd.tar.gz" "$FD_URL"
+    tar -xzf "$TMPD/fd.tar.gz" -C "$TMPD"
+    FD_BIN=$(find "$TMPD" -name "fd" -type f | head -1)
+    [[ -n "$FD_BIN" ]] && cp "$FD_BIN" /usr/local/bin/fd && chmod 755 /usr/local/bin/fd
+    rm -rf "$TMPD"
+    echo "[fd] fd installed to /usr/local/bin/fd."
+fi
+""",
+        depends="curl, python3"
+    ))
 
-    # Astral UV
-    uv_script = """
-echo "Installing uv..."
-curl -LsSf https://astral.sh/uv/install.sh | sh
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("astral-uv", "1.0.0", "Astral uv python package manager wrapper", uv_script))
+    # rnr (batch rename)
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "rnr", "0.4.1",
+        "rnr — batch rename files using regex patterns",
+        """
+echo "[rnr] Installing rnr..."
+RNR_URL=$(curl -fsSL https://api.github.com/repos/ismaelgv/rnr/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'x86_64-unknown-linux-musl' in a['name'] and a['name'].endswith('.tar.gz'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$RNR_URL" ]]; then
+    TMPD=$(mktemp -d)
+    curl -fsSL -o "$TMPD/rnr.tar.gz" "$RNR_URL"
+    tar -xzf "$TMPD/rnr.tar.gz" -C "$TMPD"
+    RNR_BIN=$(find "$TMPD" -name "rnr" -type f | head -1)
+    [[ -n "$RNR_BIN" ]] && cp "$RNR_BIN" /usr/local/bin/rnr && chmod 755 /usr/local/bin/rnr
+    rm -rf "$TMPD"
+    echo "[rnr] rnr installed."
+fi
+""",
+        depends="curl, python3"
+    ))
 
-    # Pacstall
-    pacstall_script = """
-echo "Installing pacstall..."
+    # systeroid
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "systeroid", "0.4.5",
+        "systeroid — interactive sysctl TUI manager",
+        """
+echo "[systeroid] Installing systeroid..."
+SYSTEROID_URL=$(curl -fsSL https://api.github.com/repos/orhun/systeroid/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'x86_64-unknown-linux-musl' in a['name'] and a['name'].endswith('.tar.gz'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$SYSTEROID_URL" ]]; then
+    TMPD=$(mktemp -d)
+    curl -fsSL -o "$TMPD/systeroid.tar.gz" "$SYSTEROID_URL"
+    tar -xzf "$TMPD/systeroid.tar.gz" -C "$TMPD"
+    BIN=$(find "$TMPD" -name "systeroid" -type f | head -1)
+    [[ -n "$BIN" ]] && cp "$BIN" /usr/local/bin/systeroid && chmod 755 /usr/local/bin/systeroid
+    rm -rf "$TMPD"
+    echo "[systeroid] systeroid installed."
+fi
+""",
+        depends="curl, python3"
+    ))
+
+    # navi
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "navi", "2.24.0",
+        "navi — interactive cheatsheet tool for the command line",
+        """
+echo "[navi] Installing navi..."
+NAVI_URL=$(curl -fsSL https://api.github.com/repos/denisidoro/navi/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'x86_64-unknown-linux-musl' in a['name'] and a['name'].endswith('.tar.gz'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$NAVI_URL" ]]; then
+    TMPD=$(mktemp -d)
+    curl -fsSL -o "$TMPD/navi.tar.gz" "$NAVI_URL"
+    tar -xzf "$TMPD/navi.tar.gz" -C "$TMPD"
+    BIN=$(find "$TMPD" -name "navi" -type f | head -1)
+    [[ -n "$BIN" ]] && cp "$BIN" /usr/local/bin/navi && chmod 755 /usr/local/bin/navi
+    rm -rf "$TMPD"
+    echo "[navi] navi installed."
+fi
+""",
+        depends="curl, python3"
+    ))
+
+    # xcp
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "xcp", "0.24.8",
+        "xcp — extended cp with progress bars and parallel copy",
+        """
+echo "[xcp] Installing xcp..."
+XCP_URL="https://github.com/tarka/xcp/releases/download/xcp-v0.24.8/xcp-v0.24.8-x86_64-unknown-linux-gnu.tar.gz"
+TMPD=$(mktemp -d)
+curl -fsSL -o "$TMPD/xcp.tar.gz" "$XCP_URL"
+tar -xzf "$TMPD/xcp.tar.gz" -C "$TMPD"
+BIN=$(find "$TMPD" -name "xcp" -type f | head -1)
+[[ -n "$BIN" ]] && cp "$BIN" /usr/local/bin/xcp && chmod 755 /usr/local/bin/xcp
+rm -rf "$TMPD"
+echo "[xcp] xcp installed."
+""",
+        depends="curl"
+    ))
+
+    # kibi
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "kibi", "0.9.5",
+        "kibi — tiny configurable text editor in < 1024 lines of Rust",
+        """
+echo "[kibi] Installing kibi..."
+KIBI_URL=$(curl -fsSL https://api.github.com/repos/ilai-deutel/kibi/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'x86_64-unknown-linux-musl' in a['name'] and a['name'].endswith('.tar.gz'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$KIBI_URL" ]]; then
+    TMPD=$(mktemp -d)
+    curl -fsSL -o "$TMPD/kibi.tar.gz" "$KIBI_URL"
+    tar -xzf "$TMPD/kibi.tar.gz" -C "$TMPD"
+    BIN=$(find "$TMPD" -name "kibi" -type f | head -1)
+    [[ -n "$BIN" ]] && cp "$BIN" /usr/local/bin/kibi && chmod 755 /usr/local/bin/kibi
+    rm -rf "$TMPD"
+    echo "[kibi] kibi installed."
+fi
+""",
+        depends="curl, python3"
+    ))
+
+    # czkawka
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "czkawka", "8.0.0",
+        "czkawka — fast duplicate file finder with CLI and GUI",
+        """
+echo "[czkawka] Installing czkawka..."
+CZKAWKA_URL=$(curl -fsSL https://api.github.com/repos/qarmin/czkawka/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    name=a['name'].lower()
+    if 'linux' in name and 'gui' not in name and 'x86' in name and not name.endswith('.sha256'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$CZKAWKA_URL" ]]; then
+    curl -fsSL -o /usr/local/bin/czkawka "$CZKAWKA_URL"
+    chmod 755 /usr/local/bin/czkawka
+    echo "[czkawka] czkawka installed."
+fi
+""",
+        depends="curl, python3"
+    ))
+
+    # uv (Astral UV)
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "astral-uv", "0.7.8",
+        "uv — extremely fast Python package and project manager by Astral",
+        """
+echo "[astral-uv] Installing uv..."
+UV_URL=$(curl -fsSL https://api.github.com/repos/astral-sh/uv/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'x86_64-unknown-linux-musl' in a['name'] and 'uv-x86_64' in a['name'] and a['name'].endswith('.tar.gz'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$UV_URL" ]]; then
+    TMPD=$(mktemp -d)
+    curl -fsSL -o "$TMPD/uv.tar.gz" "$UV_URL"
+    tar -xzf "$TMPD/uv.tar.gz" -C "$TMPD"
+    for bin in uv uvx; do
+        BIN=$(find "$TMPD" -name "$bin" -type f | head -1)
+        [[ -n "$BIN" ]] && cp "$BIN" /usr/local/bin/$bin && chmod 755 /usr/local/bin/$bin
+    done
+    rm -rf "$TMPD"
+    echo "[astral-uv] uv and uvx installed."
+fi
+""",
+        depends="curl, python3"
+    ))
+
+    # gemini-cli
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "gemini-cli", "0.43.0",
+        "Google Gemini CLI — AI assistant in the terminal",
+        """
+echo "[gemini-cli] Installing @google/gemini-cli via npm..."
+if ! command -v npm &>/dev/null; then
+    apt-get install -y --no-install-recommends nodejs npm 2>/dev/null || true
+fi
+npm install -g @google/gemini-cli 2>&1 | tail -5
+which gemini && echo "[gemini-cli] gemini installed: $(gemini --version 2>/dev/null || echo OK)" || true
+""",
+        depends="nodejs, npm"
+    ))
+
+    # pacstall
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "pacstall-wrapper", "6.2.1",
+        "pacstall — AUR-inspired package manager for Ubuntu/Debian",
+        """
+echo "[pacstall] Installing pacstall..."
 export DEBIAN_FRONTEND=noninteractive
-sudo bash -c "$(curl -fsSL https://pacstall.dev/q/install)" || true
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("pacstall-wrapper", "1.0.0", "Pacstall Package Manager wrapper", pacstall_script))
+apt-get install -y --no-install-recommends curl wget git sudo lsb-release 2>/dev/null | tail -3
+if curl -fsSL "https://pacstall.dev/q/install" -o /tmp/pacstall-install.sh 2>/dev/null; then
+    bash /tmp/pacstall-install.sh 2>&1 | tail -10
+    rm -f /tmp/pacstall-install.sh
+fi
+command -v pacstall && echo "[pacstall] installed OK" || echo "[pacstall] install may need reboot"
+""",
+        depends="curl, git, wget"
+    ))
 
-    # Fluent-icon-theme Git wrapper
-    fluent_script = """
-echo "Installing Fluent-icon-theme..."
+    # soar
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "soar", "1.0.0",
+        "soar — fast distro-agnostic SAB package manager",
+        """
+echo "[soar] Installing soar..."
+if [[ -f /usr/local/bin/soar ]]; then
+    echo "[soar] Already installed."
+else
+    curl -fsSL "https://raw.githubusercontent.com/pkgforge/soar/main/install.sh" | sh
+    [[ -f "$HOME/.local/bin/soar" ]] && cp "$HOME/.local/bin/soar" /usr/local/bin/soar && chmod 755 /usr/local/bin/soar || true
+fi
+""",
+        depends="curl"
+    ))
+
+    # simplemoji
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "simplemoji", "1.2.4",
+        "Simplemoji — emoji picker for COSMIC/GTK environments",
+        """
+echo "[simplemoji] Installing simplemoji..."
+SM_URL=$(curl -fsSL https://api.github.com/repos/SergioRibera/Simplemoji/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    name=a['name'].lower()
+    if 'linux' in name and ('x86_64' in name or 'amd64' in name) and not name.endswith('.sha256'):
+        print(a['browser_download_url']); break
+" 2>/dev/null)
+if [[ -n "$SM_URL" ]]; then
+    curl -fsSL -o /usr/local/bin/simplemoji "$SM_URL"
+    chmod 755 /usr/local/bin/simplemoji
+    echo "[simplemoji] simplemoji installed."
+fi
+""",
+        depends="curl, python3"
+    ))
+
+    # Fluent icon theme
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "fluent-icon-theme-installer", "2024.11.19",
+        "Fluent icon theme — modern flat icon theme for Linux desktops",
+        """
+echo "[fluent-icon-theme] Installing Fluent icon theme..."
 cd /tmp
-git clone https://github.com/vinceliuice/Fluent-icon-theme.git
+rm -rf Fluent-icon-theme
+git clone --depth=1 https://github.com/vinceliuice/Fluent-icon-theme.git
 cd Fluent-icon-theme
-./install.sh -d /usr/share/icons
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("fluent-icon-theme-installer", "1.0.0", "Fluent icon theme installer wrapper", fluent_script))
+./install.sh -d /usr/share/icons 2>&1 | tail -5
+echo "[fluent-icon-theme] Fluent icons installed."
+""",
+        depends="git"
+    ))
 
-    # Pling-store
-    pling_script = """
-echo "Installing Pling-Store AppImage..."
+    # pling-store
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "pling-store-wrapper", "5.0.2",
+        "Pling Store — desktop app discovery and installation client",
+        """
+echo "[pling-store] Installing Pling Store AppImage..."
 mkdir -p /opt/pling-store
-curl -sSL -o /opt/pling-store/PlingStore.AppImage "https://ocs-dl.fra1.cdn.digitaloceanspaces.com/data/files/1673754093/pling-store-5.0.2-1-x86-64.AppImage"
+curl -fsSL -o /opt/pling-store/PlingStore.AppImage \
+    "https://ocs-dl.fra1.cdn.digitaloceanspaces.com/data/files/1673754093/pling-store-5.0.2-1-x86-64.AppImage"
 chmod +x /opt/pling-store/PlingStore.AppImage
 ln -sf /opt/pling-store/PlingStore.AppImage /usr/local/bin/pling-store
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("pling-store-wrapper", "5.0.2", "Pling-Store Client wrapper", pling_script))
+mkdir -p /usr/share/applications
+cat > /usr/share/applications/pling-store.desktop << 'EOF'
+[Desktop Entry]
+Name=Pling Store
+Comment=Discover and install desktop content
+Exec=/usr/local/bin/pling-store
+Icon=application-x-addon
+Terminal=false
+Type=Application
+Categories=Utility;PackageManager;
+EOF
+echo "[pling-store] Pling Store installed."
+""",
+        depends="curl, libfuse2t64"
+    ))
 
-    # Script-Kit
-    sk_script = """
-echo "Installing Script-Kit AppImage..."
+    # script-kit
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "script-kit-wrapper", "3.45.1",
+        "Script Kit — automate anything with JavaScript scripts",
+        """
+echo "[script-kit] Installing Script Kit AppImage..."
 mkdir -p /opt/script-kit
-curl -sSL -o /opt/script-kit/ScriptKit.AppImage "https://github.com/johnlindquist/kit/releases/download/v3.45.1/Script-Kit-Linux-3.45.1-x86_64.AppImage" || true
+SK_URL=$(curl -fsSL https://api.github.com/repos/johnlindquist/kit/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'Linux' in a['name'] and 'x86_64' in a['name'] and a['name'].endswith('.AppImage'):
+        print(a['browser_download_url']); break
+" 2>/dev/null || echo "")
+if [[ -n "$SK_URL" ]]; then
+    curl -fsSL -o /opt/script-kit/ScriptKit.AppImage "$SK_URL"
+else
+    curl -fsSL -o /opt/script-kit/ScriptKit.AppImage \
+        "https://github.com/johnlindquist/kit/releases/download/v3.45.1/Script-Kit-Linux-3.45.1-x86_64.AppImage" || true
+fi
 chmod +x /opt/script-kit/ScriptKit.AppImage || true
 ln -sf /opt/script-kit/ScriptKit.AppImage /usr/local/bin/script-kit || true
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("script-kit-wrapper", "3.45.1", "Script-Kit Desktop Application wrapper", sk_script))
+mkdir -p /usr/share/applications
+cat > /usr/share/applications/script-kit.desktop << 'EOF'
+[Desktop Entry]
+Name=Script Kit
+Comment=Automate anything with JavaScript
+Exec=/usr/local/bin/script-kit
+Icon=application-x-executable
+Terminal=false
+Type=Application
+Categories=Development;Utility;
+EOF
+echo "[script-kit] Script Kit installed."
+""",
+        depends="curl, libfuse2t64, python3"
+    ))
 
-    # Cosmic Uniform Glass Theme
-    glass_script = """
-echo "Cloning and installing cosmic-uniform-glass-theme..."
+    # cosmic-uniform-glass-theme
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "cosmic-uniform-glass-theme-installer", "1.0.0",
+        "COSMIC Uniform Glass — frosted glass theme for COSMIC Desktop",
+        """
+echo "[cosmic-glass] Installing COSMIC Uniform Glass theme..."
 cd /tmp
-git clone https://github.com/xarbit/cosmic-uniform-glass-theme.git
+rm -rf cosmic-uniform-glass-theme
+git clone --depth=1 https://github.com/xarbit/cosmic-uniform-glass-theme.git
 mkdir -p /usr/share/cosmic/themes
 cp -r cosmic-uniform-glass-theme /usr/share/cosmic/themes/
-"""
-    packages_by_comp["main"].append(build_wrapper_deb("cosmic-uniform-glass-theme-installer", "1.0.0", "Cosmic Uniform Glass Theme installer", glass_script))
+echo "[cosmic-glass] Theme installed to /usr/share/cosmic/themes/"
+""",
+        depends="git"
+    ))
 
-    # 2. Curated optional recommended packages from xtra-pks.txt (xtra component)
-    xtra_debs = [
-        ("ferdium", "https://github.com/ferdium/ferdium-app/releases/download/v7.1.2/Ferdium-linux-Portable-7.1.2-x86_64.AppImage", "Ferdium Desktop multi-service visual app"),
-        ("nixite", "https://github.com/aspizu/nixite", "Nixite Text Editor"),
-        ("linuxtoys", "https://github.com/psygreg/linuxtoys", "Collection of toys for terminal"),
-        ("homepage", "https://github.com/gethomepage/homepage", "Homepage browser start page dashboard"),
-        ("bashsenpai", "https://github.com/BashSenpai/cli", "BashSenpai Terminal AI assistant"),
-        ("open-interpreter", "https://github.com/openinterpreter/open-interpreter", "Open Interpreter local AI agent executor"),
-        ("keygeist", "https://github.com/mudler/Keygeist", "Keygeist SSH agent UI manager")
+    # uutils coreutils wrapper
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "uutils-coreutils-wrapper", "0.0.30",
+        "uutils coreutils — Rust reimplementation of GNU coreutils (wrapper)",
+        """
+echo "[uutils] Installing uutils coreutils..."
+if command -v apt-get &>/dev/null; then
+    apt-get install -y --no-install-recommends uutils-coreutils 2>/dev/null && echo "[uutils] installed via apt" || true
+fi
+WRAPPER="/usr/local/bin/uutils-wrapper.sh"
+if [[ ! -f "$WRAPPER" ]]; then
+    cat > "$WRAPPER" << 'WRAPEOF'
+#!/bin/bash
+CMD="$(basename "$0")"
+if command -v "uu-$CMD" &>/dev/null; then
+    exec "uu-$CMD" "$@"
+else
+    exec "/usr/bin/$CMD" "$@"
+fi
+WRAPEOF
+    chmod 755 "$WRAPPER"
+fi
+echo "[uutils] Wrapper installed at $WRAPPER"
+""",
+    ))
+
+    # Noto Color Emoji
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "noto-color-emoji", "2.047",
+        "Noto Color Emoji font from Google Fonts",
+        """
+echo "[noto-emoji] Installing Noto Color Emoji font..."
+apt-get install -y --no-install-recommends fonts-noto-color-emoji 2>/dev/null || true
+echo "[noto-emoji] Done."
+""",
+    ))
+
+    # flatpak + flathub
+    packages_by_comp["main"].append(build_wrapper_deb(
+        "flatpak-flathub", "1.15.10",
+        "Flatpak with Flathub remote configured",
+        """
+echo "[flatpak] Configuring Flatpak with Flathub remote..."
+apt-get install -y flatpak gnome-software-plugin-flatpak 2>/dev/null || true
+flatpak remote-add --if-not-exists flathub \
+    https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+echo "[flatpak] Flatpak configured with Flathub."
+""",
+    ))
+
+    # ────────────────────────────────────────────────────────────────────────
+    # XTRA COMPONENT — wrapper debs
+    # ────────────────────────────────────────────────────────────────────────
+    print("\n── Xtra Wrapper DEBs ──")
+
+    xtra_wrappers = [
+        ("ferdium", "7.1.2",
+         "Ferdium — all-in-one messaging desktop app",
+         """
+mkdir -p /opt/ferdium
+curl -fsSL -o /opt/ferdium/Ferdium.AppImage \
+    https://github.com/ferdium/ferdium-app/releases/download/v7.1.2/Ferdium-linux-Portable-7.1.2-x86_64.AppImage
+chmod +x /opt/ferdium/Ferdium.AppImage
+ln -sf /opt/ferdium/Ferdium.AppImage /usr/local/bin/ferdium
+cat > /usr/share/applications/ferdium.desktop << 'EOF'
+[Desktop Entry]
+Name=Ferdium
+Comment=All-in-one messaging app
+Exec=/usr/local/bin/ferdium %U
+Icon=web-browser
+Terminal=false
+Type=Application
+Categories=Network;InstantMessaging;
+EOF
+""", "curl, libfuse2t64"),
+
+        ("waveterm", "0.10.4",
+         "WaveTerm — open-source AI-native terminal with visual blocks",
+         """
+WAVE_URL=$(curl -fsSL https://api.github.com/repos/wavetermdev/waveterm/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'linux' in a['name'].lower() and ('x86_64' in a['name'] or 'amd64' in a['name']) and a['name'].endswith('.deb'):
+        print(a['browser_download_url']); break
+    elif 'linux' in a['name'].lower() and 'x86_64' in a['name'] and a['name'].endswith('.AppImage'):
+        print(a['browser_download_url']); break
+" 2>/dev/null || echo "")
+if [[ -n "$WAVE_URL" ]]; then
+    if [[ "$WAVE_URL" == *.deb ]]; then
+        curl -fsSL -o /tmp/waveterm.deb "$WAVE_URL"
+        dpkg -i /tmp/waveterm.deb 2>/dev/null || apt-get install -f -y 2>/dev/null || true
+        rm -f /tmp/waveterm.deb
+    else
+        mkdir -p /opt/waveterm
+        curl -fsSL -o /opt/waveterm/WaveTerm.AppImage "$WAVE_URL"
+        chmod +x /opt/waveterm/WaveTerm.AppImage
+        ln -sf /opt/waveterm/WaveTerm.AppImage /usr/local/bin/waveterm
+    fi
+fi
+""", "curl, python3"),
+
+        ("webi-installers", "1.0.0",
+         "Webi — easy curl-based installers for developer tools",
+         """
+curl -fsSL https://webi.sh/webi | sh 2>/dev/null || true
+[[ -f "$HOME/.local/bin/webi" ]] && cp "$HOME/.local/bin/webi" /usr/local/bin/webi && chmod 755 /usr/local/bin/webi || true
+""", "curl"),
+
+        ("open-interpreter", "0.4.2",
+         "Open Interpreter — local AI agent that can execute code",
+         """
+pip3 install open-interpreter 2>&1 | tail -5 || pip install open-interpreter 2>&1 | tail -5 || true
+""", "python3, python3-pip"),
+
+        ("bashsenpai", "1.0.0",
+         "BashSenpai — terminal AI assistant for bash commands",
+         """
+pip3 install bashsenpai 2>&1 | tail -3 || true
+""", "python3, python3-pip"),
+
+        ("spacedrive", "0.4.2",
+         "Spacedrive — cross-platform open-source file explorer",
+         """
+SD_URL=$(curl -fsSL https://api.github.com/repos/spacedriveapp/spacedrive/releases/latest | \
+    python3 -c "
+import sys,json
+data=json.load(sys.stdin)
+for a in data.get('assets',[]):
+    if 'linux' in a['name'].lower() and 'x86_64' in a['name'] and (a['name'].endswith('.AppImage') or a['name'].endswith('.deb')):
+        print(a['browser_download_url']); break
+" 2>/dev/null || echo "")
+if [[ -n "$SD_URL" ]]; then
+    if [[ "$SD_URL" == *.deb ]]; then
+        curl -fsSL -o /tmp/spacedrive.deb "$SD_URL"
+        dpkg -i /tmp/spacedrive.deb 2>/dev/null || apt-get install -f -y 2>/dev/null || true
+        rm -f /tmp/spacedrive.deb
+    else
+        mkdir -p /opt/spacedrive
+        curl -fsSL -o /opt/spacedrive/Spacedrive.AppImage "$SD_URL"
+        chmod +x /opt/spacedrive/Spacedrive.AppImage
+        ln -sf /opt/spacedrive/Spacedrive.AppImage /usr/local/bin/spacedrive
+    fi
+fi
+""", "curl, python3"),
+
+        ("proton-pass", "1.0.0",
+         "Proton Pass — end-to-end encrypted password manager",
+         """
+PP_URL=$(curl -fsSL https://api.github.com/repos/ProtonMail/WebClients/releases/latest 2>/dev/null | \
+    python3 -c "
+import sys,json
+try:
+    data=json.load(sys.stdin)
+    for a in data.get('assets',[]):
+        if 'linux' in a['name'].lower() and a['name'].endswith('.deb'):
+            print(a['browser_download_url']); break
+except: pass
+" 2>/dev/null || echo "")
+if [[ -n "$PP_URL" ]]; then
+    curl -fsSL -o /tmp/protonpass.deb "$PP_URL"
+    dpkg -i /tmp/protonpass.deb 2>/dev/null || apt-get install -f -y 2>/dev/null || true
+    rm -f /tmp/protonpass.deb
+else
+    echo "[proton-pass] Could not auto-download — visit https://proton.me/pass/download/linux"
+fi
+""", "curl, python3"),
     ]
-    
-    for name, url, desc in xtra_debs:
-        # Build simple custom wrappers for extra apps
-        if "releases/download" in url and url.endswith(".AppImage"):
-            # AppImage wrapper
-            script = f"""
-echo "Installing {name} AppImage..."
-mkdir -p /opt/{name}
-curl -sSL -o /opt/{name}/{name}.AppImage {url}
-chmod +x /opt/{name}/{name}.AppImage
-ln -sf /opt/{name}/{name}.AppImage /usr/local/bin/{name}
-"""
-            packages_by_comp["xtra"].append(build_wrapper_deb(name, "1.0.0", desc, script, component="xtra"))
-        else:
-            # Git wrapper
-            script = f"""
-echo "Cloning {name}..."
+
+    for name, version, desc, script, deps in xtra_wrappers:
+        packages_by_comp["xtra"].append(
+            build_wrapper_deb(name, version, desc, "\n" + script, component="xtra", depends=deps)
+        )
+
+    # Git-only wrappers for xtra
+    xtra_git = [
+        ("nixite", "0.1.0", "Nixite — minimalist text editor", "https://github.com/aspizu/nixite"),
+        ("linuxtoys", "1.0.0", "LinuxToys — collection of interactive terminal toys", "https://github.com/psygreg/linuxtoys"),
+        ("keygeist", "0.1.0", "Keygeist — SSH agent UI manager", "https://github.com/mudler/Keygeist"),
+    ]
+    for name, version, desc, url in xtra_git:
+        script = f"""
+echo "[{name}] Cloning and installing {name}..."
 cd /tmp
-git clone {url}.git
-# Build/install actions as needed
+rm -rf {name}
+git clone --depth=1 {url}.git {name} 2>/dev/null || git clone --depth=1 {url} {name}
+cd {name}
+if [[ -f install.sh ]]; then bash install.sh; elif command -v cargo &>/dev/null; then cargo install --path . 2>&1 | tail -3; fi
+echo "[{name}] Done."
 """
-            packages_by_comp["xtra"].append(build_wrapper_deb(name, "1.0.0", desc, script, component="xtra"))
-            
+        packages_by_comp["xtra"].append(
+            build_wrapper_deb(name, version, desc, script, component="xtra", depends="git, curl")
+        )
+
+    # ────────────────────────────────────────────────────────────────────────
     # Generate indexes
+    # ────────────────────────────────────────────────────────────────────────
     build_repo_indexes(packages_by_comp)
-    
-    # 3. Create the Unified Distro Manifest
-    print("[*] Generating Unified Distro Manifest...")
+
+    # ────────────────────────────────────────────────────────────────────────
+    # Distro Manifest
+    # ────────────────────────────────────────────────────────────────────────
+    print("\n[*] Generating Unified Distro Manifest...")
     manifest = {
         "distro_name": "Lilith Linux",
         "base_ubuntu_codename": "resolute",
+        "repo_url": REPO_URL,
+        "generated": datetime.datetime.utcnow().isoformat() + "Z",
         "custom_repository_overlay": {
             "name": "Lilith Custom Repo",
-            "url": "https://packages.lilithlinux.org/",
+            "url": f"{REPO_URL}/",
+            "apt_source": f"deb [arch=amd64 trusted=yes] {REPO_URL} stable main xtra",
             "components": {
                 "core": [p["Package"] for p in packages_by_comp["main"]],
                 "xtra": [p["Package"] for p in packages_by_comp["xtra"]]
@@ -457,33 +1085,44 @@ git clone {url}.git
         },
         "upstream_ubuntu_resolute_packages": []
     }
-    
-    # Read upstream packages list
+
     if os.path.exists(UBUNTU_LIST):
+        seen = set()
         with open(UBUNTU_LIST, "r") as f:
             for line in f:
                 line = line.strip()
                 if line.startswith("/pool/"):
-                    # Extract package name from relative pool path
-                    filename = os.path.basename(line)
-                    pkg_name = filename.split("_", 1)[0]
-                    manifest["upstream_ubuntu_resolute_packages"].append(pkg_name)
-                    
-        # Remove duplicates
-        manifest["upstream_ubuntu_resolute_packages"] = sorted(list(set(manifest["upstream_ubuntu_resolute_packages"])))
-        print(f"[+] Loaded {len(manifest['upstream_ubuntu_resolute_packages'])} upstream Resolute Raccoon packages")
+                    pkg_name = os.path.basename(line).split("_", 1)[0]
+                    if pkg_name not in seen:
+                        seen.add(pkg_name)
+                        manifest["upstream_ubuntu_resolute_packages"].append(pkg_name)
+        manifest["upstream_ubuntu_resolute_packages"].sort()
+        print(f"[+] Loaded {len(manifest['upstream_ubuntu_resolute_packages'])} upstream packages")
     else:
-        print("[!] Warning: ubuntu-26.04-desktop-amd64.list not found, upstream packages skipped in manifest")
-        
+        print("[!] ubuntu-26.04-desktop-amd64.list not found — upstream packages omitted")
+
     with open(MANIFEST_OUT, "w") as f:
         json.dump(manifest, f, indent=4)
-    print(f"[+] Unified Distro Manifest written to {MANIFEST_OUT}")
-    
-    # Copy spec and list to Lilith-Repo
-    shutil.copy(os.path.join(LIL_BUILD, "lilith-debrep.toml"), os.path.join(REPO_ROOT, "lilith-debrep.toml"))
-    shutil.copy(os.path.join(LIL_BUILD, "packages.list"), os.path.join(REPO_ROOT, "packages.list"))
-    print("[+] Copied specs and lists to static repo folder")
-    print("=== Repo build completed successfully! ===")
+    print(f"[+] Manifest written to {MANIFEST_OUT}")
+
+    # Sync files to Lilith-Repo
+    for fname in ["lilith-debrep.toml", "packages.list", "uutils-wrapper.sh"]:
+        src = os.path.join(LIL_BUILD, fname)
+        dst = os.path.join(REPO_ROOT, fname)
+        if os.path.exists(src):
+            shutil.copy(src, dst)
+            print(f"[+] Synced {fname} → Lilith-Repo/")
+
+    # Also sync configure-lilith-os.sh
+    main_cfg = "/home/aegon/Lilith/configure-lilith-os.sh"
+    if os.path.exists(main_cfg):
+        shutil.copy(main_cfg, os.path.join(REPO_ROOT, "configure-lilith-os.sh"))
+        print("[+] Synced configure-lilith-os.sh → Lilith-Repo/")
+
+    print("\n=== Lilith Repository build complete! ===")
+    print(f"  Main packages: {len(packages_by_comp['main'])}")
+    print(f"  Xtra packages: {len(packages_by_comp['xtra'])}")
+    print(f"  Output: {REPO_ROOT}")
 
 if __name__ == "__main__":
     main()

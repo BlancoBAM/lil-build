@@ -1,9 +1,12 @@
 {
     "distro_name": "Lilith Linux",
     "base_ubuntu_codename": "resolute",
+    "repo_url": "https://packages.lilithlinux.org",
+    "generated": "2026-05-22T03:12:38.934859Z",
     "custom_repository_overlay": {
         "name": "Lilith Custom Repo",
         "url": "https://packages.lilithlinux.org/",
+        "apt_source": "deb [arch=amd64 trusted=yes] https://packages.lilithlinux.org stable main xtra",
         "components": {
             "core": [
                 "offerings",
@@ -16,26 +19,42 @@
                 "zoxide",
                 "bat",
                 "s8n-system",
+                "hellfire",
                 "browseros",
                 "hyper-terminal",
                 "vicinae",
                 "lilith-tts",
-                "hellfire",
-                "soar",
+                "nushell",
+                "fd-lilith",
+                "rnr",
+                "systeroid",
+                "navi",
+                "xcp",
+                "kibi",
+                "czkawka",
                 "astral-uv",
+                "gemini-cli",
                 "pacstall-wrapper",
+                "soar",
+                "simplemoji",
                 "fluent-icon-theme-installer",
                 "pling-store-wrapper",
                 "script-kit-wrapper",
-                "cosmic-uniform-glass-theme-installer"
+                "cosmic-uniform-glass-theme-installer",
+                "uutils-coreutils-wrapper",
+                "noto-color-emoji",
+                "flatpak-flathub"
             ],
             "xtra": [
                 "ferdium",
+                "waveterm",
+                "webi-installers",
+                "open-interpreter",
+                "bashsenpai",
+                "spacedrive",
+                "proton-pass",
                 "nixite",
                 "linuxtoys",
-                "homepage",
-                "bashsenpai",
-                "open-interpreter",
                 "keygeist"
             ]
         }

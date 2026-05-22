@@ -1,0 +1,33 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: Lilith Linux
+Label: Lilith Linux Overlay
+Suite: stable
+Codename: stable
+Date: Fri, 22 May 2026 03:12:38 UTC
+Architectures: amd64
+Components: main xtra
+Description: Thin package overlay for Lilith Linux (Ubuntu Resolute base)
+SHA256:
+ 5c035c5ed3c75aeb89c4e32f15f05f5fcbf385c386158fa762347b9d21a0aa98 12873 main/binary-amd64/Packages
+ 1e076ef1cf58800042c914bf3d92584e315b658895011935631e93a369389304 4165 main/binary-amd64/Packages.gz
+ 100cbc3e7cc608a3c902800d3e703f6f675cd723234ebeb404433bb81892c8c3 3520 xtra/binary-amd64/Packages
+ f27a26b893d344301caca87bd199063b7c30b7f8ffd87c842a79517c7ed28fdd 1184 xtra/binary-amd64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iQJNBAEBCgA3FiEEFsYhKu6hnMM1EsqovjGRltuWMLwFAmoPyaYZHHBhY2thZ2Vz
+QGxpbGl0aGxpbnV4Lm9yZwAKCRC+MZGW25YwvEZnD/9gWZ30CMlivqL8QdKu9kAL
+/S0p8kL06vUaVYBNA3Ku74km+BSbFm1h605h23+bSCEKs2fA+B+Nqsk5pjs/J8vT
+H0AH+w7jORTQZisKJ64ced/lAGHKMxx1mVqEZdYnMoUbpYid+jOzgjbfycV63DrX
+WAyOgFR9rRQ+8Jp/JR8EdoioJps5wmvW6om/Dihu3baYsx/ioTDxxq5Izu55OOD6
+3cgoLrOQAvPC20ETSMnK5XGoYRxV/1Sni5ptnXZXZv47hsB3320bdnWTz7WfeHa8
+CAq2OdO+pC1A8lGq1RHa9v/hLlnqCHgfQdYgVhto3Ltg2BDoc4iJ/GAWEkno5gVl
+O4Wc8vSPXIMgyJViNgjlKiII0rhnlmAy75RUBr01r14+orekeB/jmFd5uAN2Vrnb
+f34Gk/JVaBTMSAJ4qs5JVCqjP6xe2h1kVY70di6PvU1BHWRVXwvUSKIcmnCwrqJT
+kF9OsWbMa+OBkUKCHMiAqALaYNaavKGuPY+1f0XPvJrhrmB1Kg8YfZwLFjuKUoGB
+9LGz5RT5eg//n3hQoMF2AxwguDpr+X7rEk+QiqTF2Z3lnISUFK7O7Cs0avM5oZcd
+dfAmndPxlEErrz5LENDgsoBV0Fbn5GAaxSUEWHL35fsYf2yH4YQyWQDOrywZVvM/
+eMPBAe3p0CLhwTOaBqSR5g==
+=4NKx
+-----END PGP SIGNATURE-----

@@ -4,4 +4,4 @@ Suite: stable
 Version: 1.0.0
 Component: main
 Architecture: amd64
-Description: Lilith Linux Main Redirect Packages
+Description: Lilith Linux Main overlay packages

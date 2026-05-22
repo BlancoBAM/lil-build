@@ -90,116 +90,256 @@ Package: s8n-system
 Version: 0.1.3
 Architecture: amd64
 Filename: pool/main/s8n-system_0.1.3_amd64.deb
-Size: 706
-SHA256: bcd0d7b78793060e8344c36ac6ec11aad0ecc1803f590ac975b6bb196750e071
+Size: 752
+SHA256: ef3eb96ba7f3256e153f3076949f1fd87152e0972d9189102253871e97e5ef49
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Lilith System Package Manager CLI wrapper (Wrapper)
+Description: Lilith System Package Manager CLI (s8n) (Lilith Wrapper)
+Depends: curl
+
+Package: hellfire
+Version: 152.0a1
+Architecture: amd64
+Filename: pool/main/hellfire_152.0a1_amd64.deb
+Size: 1542
+SHA256: bc3f25295e57f76ae30e81626ce7ec1c03d7a6fad44597974ae5bfe0ae8fbdc6
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: HellFire Browser — privacy-focused custom Firefox for Lilith Linux (Lilith Wrapper)
+Depends: curl, libfuse2t64
 
 Package: browseros
-Version: 0.42.0
+Version: 0.42.0.1
 Architecture: amd64
-Filename: pool/main/browseros_0.42.0_amd64.deb
-Size: 860
-SHA256: 70855c52e75211e2441522224c087d078477b27953cc1630f2a51edda7e6bdfd
+Filename: pool/main/browseros_0.42.0.1_amd64.deb
+Size: 884
+SHA256: b234dd4b92e45950139f2514ef1fd875db669bf36a3f3dde2713d06f9f0d60f3
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Lilith Default Web Browser OS AppImage (Wrapper)
+Description: Lilith Default Web Browser OS AppImage (Lilith Wrapper)
+Depends: curl, libfuse2t64
 
 Package: hyper-terminal
 Version: 3.4.1
 Architecture: amd64
 Filename: pool/main/hyper-terminal_3.4.1_amd64.deb
-Size: 856
-SHA256: ae643656afa26faa7ae94c41d56ba9df286eb0ab463300e112e1ddad8573c65b
+Size: 870
+SHA256: f8214bc37d97a1033539e6c6a2abca7ce5336050f8c9db065024333cc163ae5f
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Hyper terminal emulator for Lilith Linux (Wrapper)
+Description: Hyper terminal emulator for Lilith Linux (Lilith Wrapper)
+Depends: curl, libfuse2t64
 
 Package: vicinae
 Version: 0.21.0
 Architecture: amd64
 Filename: pool/main/vicinae_0.21.0_amd64.deb
-Size: 852
-SHA256: a3bc04257681bee036ea6476b8eec7d92e538ef3938e312a8a1e2a6e7b4b4a3f
+Size: 880
+SHA256: c3f03bbdf732b3d021eec038b99ed9b0358632c9289159be281a5746fa3e6a65
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Vicinae Visual Workspace AppImage (Wrapper)
+Description: Vicinae Visual Workspace AppImage (Lilith Wrapper)
+Depends: curl, libfuse2t64
 
 Package: lilith-tts
 Version: 1.0.0
 Architecture: amd64
 Filename: pool/main/lilith-tts_1.0.0_amd64.deb
-Size: 744
-SHA256: fc7e733e2694618d8c8b332ce7344b24c5f11aa2225b9688ba4bd47d6c314097
+Size: 888
+SHA256: 550940ac9cf457ce677303977b13060cabf2fbc3dd0c052019fc78c6dd7d283d
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Text-to-Speech Engine (Wrapper)
+Description: Lilith Linux Text-to-Speech Engine (Lilith Wrapper)
+Depends: git, curl
 
-Package: hellfire
-Version: 1.0.0
+Package: nushell
+Version: 0.103.0
 Architecture: amd64
-Filename: pool/main/hellfire_1.0.0_amd64.deb
-Size: 728
-SHA256: e2bc9c83d8a06303a30219e38c23838dda6bba6f2a1027f0e38bccc075af4e8b
+Filename: pool/main/nushell_0.103.0_amd64.deb
+Size: 1078
+SHA256: 27487d85daba460b1e9333780e4308131ea7592142a9f6edf095e023a0b9722b
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: HellFire Distro Tool (Wrapper)
+Description: Nu shell — structured data shell written in Rust (Lilith Wrapper)
+Depends: curl, python3
+
+Package: fd-lilith
+Version: 10.2.0
+Architecture: amd64
+Filename: pool/main/fd-lilith_10.2.0_amd64.deb
+Size: 1064
+SHA256: 531095d6acb242987c4459599362381d3eb8c56f2ed6512ed00b1a9f7f952adb
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: fd — fast and user-friendly find alternative (Lilith binary edition) (Lilith Wrapper)
+Depends: curl, python3
+
+Package: rnr
+Version: 0.4.1
+Architecture: amd64
+Filename: pool/main/rnr_0.4.1_amd64.deb
+Size: 1022
+SHA256: 6328c9bbff21aa35051188959a102c6d381047487f3803af181bc9da2bbe2787
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: rnr — batch rename files using regex patterns (Lilith Wrapper)
+Depends: curl, python3
+
+Package: systeroid
+Version: 0.4.5
+Architecture: amd64
+Filename: pool/main/systeroid_0.4.5_amd64.deb
+Size: 1028
+SHA256: 8342cd37315980765825738c511c2953364841690b57a9dc271d8b5c4e7f53b3
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: systeroid — interactive sysctl TUI manager (Lilith Wrapper)
+Depends: curl, python3
+
+Package: navi
+Version: 2.24.0
+Architecture: amd64
+Filename: pool/main/navi_2.24.0_amd64.deb
+Size: 1032
+SHA256: 6166cbac02f259fe3bd76329bdd63425c2a0b12edb9e2c5e8c4067b4cb65908b
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: navi — interactive cheatsheet tool for the command line (Lilith Wrapper)
+Depends: curl, python3
+
+Package: xcp
+Version: 0.24.8
+Architecture: amd64
+Filename: pool/main/xcp_0.24.8_amd64.deb
+Size: 866
+SHA256: 84ce468cb4165619cd27a4ad676483551d149e31b1b4f86c4447defd6eab4ea1
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: xcp — extended cp with progress bars and parallel copy (Lilith Wrapper)
+Depends: curl
+
+Package: kibi
+Version: 0.9.5
+Architecture: amd64
+Filename: pool/main/kibi_0.9.5_amd64.deb
+Size: 1040
+SHA256: f7c92d272403b91a6055e8f1227c21bd299f2d76d7ecbe336070ce1a7c247872
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: kibi — tiny configurable text editor in < 1024 lines of Rust (Lilith Wrapper)
+Depends: curl, python3
+
+Package: czkawka
+Version: 8.0.0
+Architecture: amd64
+Filename: pool/main/czkawka_8.0.0_amd64.deb
+Size: 952
+SHA256: 89c9c3f4919c330412cc4f8888ed2fa2650cfe0b82ec48d234dd793d61c9934d
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: czkawka — fast duplicate file finder with CLI and GUI (Lilith Wrapper)
+Depends: curl, python3
+
+Package: astral-uv
+Version: 0.7.8
+Architecture: amd64
+Filename: pool/main/astral-uv_0.7.8_amd64.deb
+Size: 1072
+SHA256: 4f38d2ddf82b14710fc112e868151415dd1790e8ce24b79a654420f1a6ec8c40
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: uv — extremely fast Python package and project manager by Astral (Lilith Wrapper)
+Depends: curl, python3
+
+Package: gemini-cli
+Version: 0.43.0
+Architecture: amd64
+Filename: pool/main/gemini-cli_0.43.0_amd64.deb
+Size: 786
+SHA256: 9db48fccba869d0542f804e3a95f460631b84c92883628aa41fd771eacb94e5e
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Google Gemini CLI — AI assistant in the terminal (Lilith Wrapper)
+Depends: nodejs, npm
+
+Package: pacstall-wrapper
+Version: 6.2.1
+Architecture: amd64
+Filename: pool/main/pacstall-wrapper_6.2.1_amd64.deb
+Size: 854
+SHA256: ab0931643fa52dfe09dcf6bc356605022f17a6e601c0d95f94981fe682907b2e
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: pacstall — AUR-inspired package manager for Ubuntu/Debian (Lilith Wrapper)
+Depends: curl, git, wget
 
 Package: soar
 Version: 1.0.0
 Architecture: amd64
 Filename: pool/main/soar_1.0.0_amd64.deb
-Size: 654
-SHA256: 4a161373ce0c9db067d721f7f715bdb27af26979d6eaa2a3ee24b985820b57a7
+Size: 776
+SHA256: dc8fc11a8a33d3906806485a7640378461e21688377d2b2fb76491ccf38d52b8
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Soar Package Manager wrapper (Wrapper)
+Description: soar — fast distro-agnostic SAB package manager (Lilith Wrapper)
+Depends: curl
 
-Package: astral-uv
-Version: 1.0.0
+Package: simplemoji
+Version: 1.2.4
 Architecture: amd64
-Filename: pool/main/astral-uv_1.0.0_amd64.deb
-Size: 640
-SHA256: 06835211efcb1fbb0c812c54f35e61108fc8afd244084d603e5dc58c606a39cf
+Filename: pool/main/simplemoji_1.2.4_amd64.deb
+Size: 958
+SHA256: 669d8f4a62784bdea204bce0a72c2620b5a8ac96baa8f349da81d6095bc1bebd
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Astral uv python package manager wrapper (Wrapper)
-
-Package: pacstall-wrapper
-Version: 1.0.0
-Architecture: amd64
-Filename: pool/main/pacstall-wrapper_1.0.0_amd64.deb
-Size: 682
-SHA256: 32e464314d1b2e32ce10a8483777456d08c18955a7189ae99cdfed76e14f54cc
-Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Pacstall Package Manager wrapper (Wrapper)
+Description: Simplemoji — emoji picker for COSMIC/GTK environments (Lilith Wrapper)
+Depends: curl, python3
 
 Package: fluent-icon-theme-installer
-Version: 1.0.0
+Version: 2024.11.19
 Architecture: amd64
-Filename: pool/main/fluent-icon-theme-installer_1.0.0_amd64.deb
-Size: 672
-SHA256: 65ac2627e53dcf74dd5e7d52859d80564731b34d28ddc500bc2cb8e009a15627
+Filename: pool/main/fluent-icon-theme-installer_2024.11.19_amd64.deb
+Size: 748
+SHA256: 92e794ad3595aba868dfd368851186d2e7fa30afda9ad12d45b677e8e78a359d
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Fluent icon theme installer wrapper (Wrapper)
+Description: Fluent icon theme — modern flat icon theme for Linux desktops (Lilith Wrapper)
+Depends: git
 
 Package: pling-store-wrapper
 Version: 5.0.2
 Architecture: amd64
 Filename: pool/main/pling-store-wrapper_5.0.2_amd64.deb
-Size: 734
-SHA256: 459fb7a589c7ff4ad128e77fd272a0534d78620bd2f40e14af72fcc3866a0aa7
+Size: 942
+SHA256: 979db0129044f646deba87f4ecca08dfc34939b26a5d3f152baa8ae9ededf281
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Pling-Store Client wrapper (Wrapper)
+Description: Pling Store — desktop app discovery and installation client (Lilith Wrapper)
+Depends: curl, libfuse2t64
 
 Package: script-kit-wrapper
 Version: 3.45.1
 Architecture: amd64
 Filename: pool/main/script-kit-wrapper_3.45.1_amd64.deb
-Size: 752
-SHA256: a9a154211b5f9662a2893a303ad5f27645703c03786e838f63d046b29d747118
+Size: 1162
+SHA256: 0bf79de6d82ad97ba5ce7a9b44ff24b91b572d572802bdb83de2bb4131905ced
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Script-Kit Desktop Application wrapper (Wrapper)
+Description: Script Kit — automate anything with JavaScript scripts (Lilith Wrapper)
+Depends: curl, libfuse2t64, python3
 
 Package: cosmic-uniform-glass-theme-installer
 Version: 1.0.0
 Architecture: amd64
 Filename: pool/main/cosmic-uniform-glass-theme-installer_1.0.0_amd64.deb
-Size: 688
-SHA256: 4dc3cccce294ccc6c9754613166a716d7982ff78f29eaefa41c383d4913ffbf4
+Size: 752
+SHA256: 4c2abfb3af102bef7a0fb7be15041c756aef29d1a2a869fba70c207151d97c6c
 Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
-Description: Cosmic Uniform Glass Theme installer (Wrapper)
+Description: COSMIC Uniform Glass — frosted glass theme for COSMIC Desktop (Lilith Wrapper)
+Depends: git
+
+Package: uutils-coreutils-wrapper
+Version: 0.0.30
+Architecture: amd64
+Filename: pool/main/uutils-coreutils-wrapper_0.0.30_amd64.deb
+Size: 862
+SHA256: 3294877d35b534e620444499c040b7ff13fd363d016c3eef06efd2b230b00b75
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: uutils coreutils — Rust reimplementation of GNU coreutils (wrapper) (Lilith Wrapper)
+
+Package: noto-color-emoji
+Version: 2.047
+Architecture: amd64
+Filename: pool/main/noto-color-emoji_2.047_amd64.deb
+Size: 670
+SHA256: a4ff638457e06641d766b2f4ab7f25fb27f8330a8d3c70551aab6d14917b7a90
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Noto Color Emoji font from Google Fonts (Lilith Wrapper)
+
+Package: flatpak-flathub
+Version: 1.15.10
+Architecture: amd64
+Filename: pool/main/flatpak-flathub_1.15.10_amd64.deb
+Size: 724
+SHA256: cdccfeb2bec21936fd316d4cef882826977e8fcb15639021296fef1224d50bb8
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Flatpak with Flathub remote configured (Lilith Wrapper)
 

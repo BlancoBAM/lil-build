@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lilith Linux Package Repository</title>
+    <meta name="description" content="Official repository index, system configuration instructions, ISO downloads, and help manual for Lilith Linux, a modern security and utility-oriented Linux OS overlay.">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #06060a;
+            --surface-color: rgba(20, 20, 30, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-primary: #8a2be2;
+            --accent-primary-rgb: 138, 43, 226;
+            --accent-secondary: #ff2e56;
+            --accent-secondary-rgb: 255, 46, 86;
+            --accent-glow: rgba(138, 43, 226, 0.15);
+            --code-bg: #0f0f15;
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(var(--accent-primary-rgb), 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(var(--accent-secondary-rgb), 0.03) 0%, transparent 40%);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(6, 6, 10, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .logo svg {
+            width: 28px;
+            height: 28px;
+            fill: url(#logo-grad);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+            text-shadow: 0 0 8px rgba(var(--accent-primary-rgb), 0.6);
+        }
+
+        .hero {
+            padding: 6rem 2rem 4rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-badge {
+            background: rgba(var(--accent-secondary-rgb), 0.1);
+            border: 1px solid rgba(var(--accent-secondary-rgb), 0.3);
+            border-radius: 100px;
+            color: var(--accent-secondary);
+            display: inline-block;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            padding: 0.4rem 1.2rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(var(--accent-secondary-rgb), 0.15);
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2.5rem auto;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.8rem 1.8rem;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            border-color: transparent;
+            box-shadow: 0 4px 20px rgba(var(--accent-primary-rgb), 0.35);
+        }
+
+        .btn-primary:hover {
+            background: #9b47eb;
+            border-color: transparent;
+            box-shadow: 0 6px 25px rgba(var(--accent-primary-rgb), 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            background: rgba(var(--accent-secondary-rgb), 0.03);
+            box-shadow: 0 4px 15px rgba(var(--accent-secondary-rgb), 0.05);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(var(--accent-secondary-rgb), 0.1);
+            border-color: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(var(--accent-secondary-rgb), 0.2);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        @media (min-width: 900px) {
+            .grid {
+                grid-template-columns: 3fr 2fr;
+            }
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.2rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            opacity: 0.5;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .card-title i {
+            color: var(--accent-primary);
+        }
+
+        .card-title.accent-red i {
+            color: var(--accent-secondary);
+        }
+
+        .card-title.accent-red::before {
+            background: linear-gradient(90deg, transparent, var(--accent-secondary), transparent);
+        }
+
+        .setup-step {
+            margin-bottom: 2rem;
+        }
+
+        .setup-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: rgba(var(--accent-primary-rgb), 0.15);
+            border: 1px solid rgba(var(--accent-primary-rgb), 0.4);
+            color: var(--text-primary);
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .step-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem 3.5rem 1rem 1.2rem;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            color: #d1d5db;
+            overflow-x: auto;
+            position: relative;
+            margin-bottom: 0.8rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            padding: 0.4rem 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Package Directory section */
+        .packages-section {
+            margin-top: 2rem;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .search-input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.8rem 1rem 0.8rem 2.8rem;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px rgba(var(--accent-primary-rgb), 0.25);
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-chip {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 100px;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            white-space: nowrap;
+        }
+
+        .filter-chip:hover {
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .filter-chip.active {
+            background: rgba(var(--accent-primary-rgb), 0.15);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 10px rgba(var(--accent-primary-rgb), 0.1);
+        }
+
+        .packages-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .packages-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .packages-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .pkg-card {
+            background: rgba(20, 20, 30, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .pkg-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(var(--accent-primary-rgb), 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(var(--accent-primary-rgb), 0.05);
+        }
+
+        .pkg-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+
+        .pkg-name {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .pkg-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .pkg-badge.wrapper {
+            background: rgba(var(--accent-secondary-rgb), 0.08);
+            color: var(--accent-secondary);
+            border-color: rgba(var(--accent-secondary-rgb), 0.2);
+        }
+
+        .pkg-desc {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-bottom: 1.2rem;
+            flex-grow: 1;
+        }
+
+        .pkg-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.8rem;
+        }
+
+        .pkg-command {
+            font-family: var(--font-mono);
+            color: #d1d5db;
+        }
+
+        /* Help Manual tabs */
+        .manual-section {
+            margin-top: 4rem;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1rem 1.8rem;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            transition: color 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .manual-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .manual-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .manual-item h3 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .manual-item p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .manual-item ul {
+            list-style-position: inside;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .manual-item ul li {
+            margin-bottom: 0.4rem;
+        }
+
+        .inline-code {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #d1d5db;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+            margin-top: 6rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer p {
+            margin-bottom: 1rem;
+        }
+
+        footer a {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* SVG definition for logo gradient */
+        .svg-defs {
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: -300px;
+            background: rgba(20, 20, 30, 0.9);
+            border: 1px solid var(--accent-primary);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 4px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .alert-toast.show {
+            right: 2rem;
+        }
+
+        .alert-toast i {
+            color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG Gradients -->
+    <svg class="svg-defs">
+        <defs>
+            <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8a2be2" />
+                <stop offset="100%" stop-color="#ff2e56" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <svg viewBox="0 0 100 100">
+                    <polygon points="50,10 90,85 10,85" stroke-width="4" stroke="currentColor" fill="none"/>
+                    <polygon points="50,25 78,80 22,80" stroke-width="4" stroke="currentColor" fill="none"/>
+                    <circle cx="50" cy="53" r="10"/>
+                </svg>
+                Lilith Linux
+            </a>
+            <ul class="nav-links">
+                <li><a href="#setup">Repository Setup</a></li>
+                <li><a href="#packages">Package Index</a></li>
+                <li><a href="#iso">OS ISO Download</a></li>
+                <li><a href="#manual">Help Manual</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-badge">Custom Overlay Repository</div>
+        <h1>Thin Package Overlay for <span>Lilith Linux</span></h1>
+        <p>A high-performance orchestration layers suite, providing curated security tools, custom terminal configs, and AI assistants. Seamlessly merges Ubuntu Resolute base with customized native wrappers.</p>
+        <div class="hero-buttons">
+            <a href="#setup" class="btn btn-primary"><i class="fa-solid fa-terminal"></i> Configure Sources</a>
+            <a href="#iso" class="btn btn-secondary"><i class="fa-solid fa-download"></i> Get Lilith OS ISO</a>
+        </div>
+    </section>
+
+    <main>
+        <div class="grid" id="setup">
+            <!-- Left Panel: APT Setup -->
+            <div class="card">
+                <h2 class="card-title"><i class="fa-solid fa-code"></i> Repository Sources Configuration</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Run the following commands on your Lilith Linux installation or compatible Ubuntu 26.04+ system to configure secure APT sources and prioritize the overlay repository.</p>
+                
+                <div class="setup-step">
+                    <div class="step-header">
+                        <span class="step-num">1</span> Download and Import GPG Archive Key
+                    </div>
+                    <div class="code-block">curl -fsSL https://packages.lilithlinux.org/lilith-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/lilith-archive-keyring.gpg<button class="copy-btn" onclick="copyCode(this)"><i class="fa-regular fa-copy"></i></button></div>
+                </div>
+
+                <div class="setup-step">
+                    <div class="step-header">
+                        <span class="step-num">2</span> Add Lilith Repository to Sources List
+                    </div>
+                    <div class="code-block">echo "deb [arch=amd64 signed-by=/usr/share/keyrings/lilith-archive-keyring.gpg] https://packages.lilithlinux.org stable main xtra" | sudo tee /etc/apt/sources.list.d/lilith.list<button class="copy-btn" onclick="copyCode(this)"><i class="fa-regular fa-copy"></i></button></div>
+                </div>
+
+                <div class="setup-step">
+                    <div class="step-header">
+                        <span class="step-num">3</span> Configure APT Pinning Priority (Prefer Lilith Overlay)
+                    </div>
+                    <div class="code-block">sudo tee /etc/apt/preferences.d/lilith-priority &lt;&lt; 'EOF'
+Package: *
+Pin: origin packages.lilithlinux.org
+Pin-Priority: 900
+
+Package: *
+Pin: origin ""
+Pin-Priority: 500
+EOF<button class="copy-btn" onclick="copyCode(this)"><i class="fa-regular fa-copy"></i></button></div>
+                </div>
+
+                <div class="setup-step">
+                    <div class="step-header">
+                        <span class="step-num">4</span> Synchronize Indexes & Install Core Utility
+                    </div>
+                    <div class="code-block">sudo apt update && sudo apt install -y hellfire<button class="copy-btn" onclick="copyCode(this)"><i class="fa-regular fa-copy"></i></button></div>
+                </div>
+            </div>
+
+            <!-- Right Panel: ISO Download & Info -->
+            <div class="card" id="iso">
+                <h2 class="card-title accent-red"><i class="fa-solid fa-compact-disc"></i> ISO Download Center</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Download the full, pre-configured Lilith Linux operating system. Features the custom boot animation, loading spinner, shell layouts, and pre-seeded repository.</p>
+                
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.2rem; margin-bottom: 2rem;">
+                    <div style="font-family: var(--font-display); font-weight: 600; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+                        <span>Lilith Linux Resolute</span>
+                        <span style="color: var(--accent-secondary)">v1.0.0 Stable</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Architecture: <strong>AMD64 (x86_64)</strong></div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">File Size: <strong>2.44 GB</strong></div>
+                    <div style="font-size: 0.82rem; color: var(--text-secondary); font-family: var(--font-mono); word-break: break-all;">
+                        SHA256: <strong style="color: var(--text-primary)">7f49c0ea42e971253c9e6c98aa6a7e3d8f8a1682cd1d4e738c8230b0ee1f6a4b</strong>
+                    </div>
+                </div>
+
+                <a href="/downloads/lilith-resolute-26.04-amd64.iso" class="btn btn-primary btn-secondary" style="width: 100%; justify-content: center; padding: 1rem;" onclick="event.preventDefault(); alert('ISO build is currently executing inside the staging environment. Once finalized, the link will be active.');">
+                    <i class="fa-solid fa-download"></i> Download Official ISO (Offline)
+                </a>
+
+                <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-secondary);">
+                    <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-key"></i> Verify Your Download</h4>
+                    <p>To verify the integrity of the downloaded ISO file, run this command in your terminal:</p>
+                    <div class="code-block" style="padding: 0.8rem 2.8rem 0.8rem 0.8rem; font-size: 0.8rem; margin-top: 0.5rem;">sha256sum lilith-resolute-26.04-amd64.iso<button class="copy-btn" onclick="copyCode(this)"><i class="fa-regular fa-copy"></i></button></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Package Directory -->
+        <section class="packages-section" id="packages">
+            <h2 class="card-title" style="font-size: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-cubes"></i> Curated Package Directory</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 800px;">Explore custom metadata and installer wrappers hosted on the Lilith Repository. These packages compile config sets, register tools, and link backends transparently.</p>
+            
+            <div class="search-bar">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" id="pkgSearch" placeholder="Search packages by name, description, or commands..." onkeyup="filterPackages()">
+                </div>
+            </div>
+
+            <div class="category-filters">
+                <div class="filter-chip active" onclick="setCategoryFilter('all', this)">All Packages</div>
+                <div class="filter-chip" onclick="setCategoryFilter('wrapper', this)">Installer Wrappers</div>
+                <div class="filter-chip" onclick="setCategoryFilter('system', this)">Core System</div>
+                <div class="filter-chip" onclick="setCategoryFilter('gui', this)">GUI Apps</div>
+                <div class="filter-chip" onclick="setCategoryFilter('dev', this)">Developer Tools</div>
+            </div>
+
+            <div class="packages-grid" id="packagesGrid">
+                <!-- HellFire -->
+                <div class="pkg-card" data-category="wrapper gui">
+                    <div class="pkg-header">
+                        <span class="pkg-name">hellfire</span>
+                        <span class="pkg-badge wrapper">wrapper</span>
+                    </div>
+                    <div class="pkg-desc">Ultimate privacy-focused browser built from compiled sources. Installs locally under /opt/hellfire, sets up desktop integrations, and handles first-launch configurations automatically.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">hellfire</span></span>
+                        <span>v152.0a1</span>
+                    </div>
+                </div>
+
+                <!-- Lilim -->
+                <div class="pkg-card" data-category="system">
+                    <div class="pkg-header">
+                        <span class="pkg-name">lilim</span>
+                        <span class="pkg-badge">system</span>
+                    </div>
+                    <div class="pkg-desc">The core orchestration daemon and framework shell helper for Lilith Linux. Standardizes configuration variables, installs AI bundles, and checks package integrity.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">lilim</span></span>
+                        <span>v0.1.0</span>
+                    </div>
+                </div>
+
+                <!-- Stake -->
+                <div class="pkg-card" data-category="system">
+                    <div class="pkg-header">
+                        <span class="pkg-name">stake</span>
+                        <span class="pkg-badge">system</span>
+                    </div>
+                    <div class="pkg-desc">The unified configuration utility for Lilith Linux package backends. Configures APT pinning, Flatpak references, Pacstall wrappers, and repositories.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">stake</span></span>
+                        <span>v0.2.3</span>
+                    </div>
+                </div>
+
+                <!-- s8n-system -->
+                <div class="pkg-card" data-category="system dev">
+                    <div class="pkg-header">
+                        <span class="pkg-name">s8n-system</span>
+                        <span class="pkg-badge">system</span>
+                    </div>
+                    <div class="pkg-desc">Cyber-themed shell enhancement suite. Patches terminal themes, installs custom dotfiles, imports prompt formatting, and enables quick aliases.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">s8n</span></span>
+                        <span>v0.1.3</span>
+                    </div>
+                </div>
+
+                <!-- vicinae -->
+                <div class="pkg-card" data-category="system gui">
+                    <div class="pkg-header">
+                        <span class="pkg-name">vicinae</span>
+                        <span class="pkg-badge">system</span>
+                    </div>
+                    <div class="pkg-desc">Local network sharing and sync daemon. Integrates seamlessly into the desktop to coordinate configurations and package installs across local nodes.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">vicinae</span></span>
+                        <span>v0.21.0</span>
+                    </div>
+                </div>
+
+                <!-- open-interpreter -->
+                <div class="pkg-card" data-category="wrapper dev">
+                    <div class="pkg-header">
+                        <span class="pkg-name">open-interpreter</span>
+                        <span class="pkg-badge wrapper">wrapper</span>
+                    </div>
+                    <div class="pkg-desc">AI-agent shell wrapper. Installs the open-interpreter Python library, wires python environment paths, and handles system integration for LLM terminal executions.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">interpreter</span></span>
+                        <span>v0.4.2</span>
+                    </div>
+                </div>
+
+                <!-- spacedrive -->
+                <div class="pkg-card" data-category="wrapper gui">
+                    <div class="pkg-header">
+                        <span class="pkg-name">spacedrive</span>
+                        <span class="pkg-badge wrapper">wrapper</span>
+                    </div>
+                    <div class="pkg-desc">High-performance cross-platform file manager written in Rust. Wrapper setup pulls stable AppImage releases, creates desktop entry, and configures native hooks.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">spacedrive</span></span>
+                        <span>v0.4.2</span>
+                    </div>
+                </div>
+
+                <!-- waveterm -->
+                <div class="pkg-card" data-category="wrapper gui">
+                    <div class="pkg-header">
+                        <span class="pkg-name">waveterm</span>
+                        <span class="pkg-badge wrapper">wrapper</span>
+                    </div>
+                    <div class="pkg-desc">A collaborative, web-native terminal. Installs WaveTerm portable components, adds user configurations, and sets up launcher icons system-wide.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">waveterm</span></span>
+                        <span>v0.10.4</span>
+                    </div>
+                </div>
+
+                <!-- uutils-coreutils-wrapper -->
+                <div class="pkg-card" data-category="wrapper system">
+                    <div class="pkg-header">
+                        <span class="pkg-name">uutils-coreutils-wrapper</span>
+                        <span class="pkg-badge wrapper">wrapper</span>
+                    </div>
+                    <div class="pkg-desc">Replaces legacy GNU coreutils with safe, fast Rust equivalents via uutils. Manages symlinks for ls, cp, mv, cat, and other shell foundations.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">uutils-coreutils</span></span>
+                        <span>v0.0.30</span>
+                    </div>
+                </div>
+
+                <!-- nushell -->
+                <div class="pkg-card" data-category="wrapper dev">
+                    <div class="pkg-header">
+                        <span class="pkg-name">nushell</span>
+                        <span class="pkg-badge wrapper">wrapper</span>
+                    </div>
+                    <div class="pkg-desc">Wrapper for the Nushell structured shell. Downloads official releases, binds environment flags, and sets up Nu config profiles on installation.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">nu</span></span>
+                        <span>v0.103.0</span>
+                    </div>
+                </div>
+
+                <!-- topgrade -->
+                <div class="pkg-card" data-category="wrapper system">
+                    <div class="pkg-header">
+                        <span class="pkg-name">topgrade</span>
+                        <span class="pkg-badge wrapper">wrapper</span>
+                    </div>
+                    <div class="pkg-desc">Wrapper to install and configure Topgrade, a utility that updates all installed package managers (APT, flatpak, cargo, snap) simultaneously.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">topgrade</span></span>
+                        <span>v17.5.0</span>
+                    </div>
+                </div>
+
+                <!-- lsd -->
+                <div class="pkg-card" data-category="wrapper dev">
+                    <div class="pkg-header">
+                        <span class="pkg-name">lsd</span>
+                        <span class="pkg-badge wrapper">wrapper</span>
+                    </div>
+                    <div class="pkg-desc">Next-generation ls command with icons, colors, and configuration structures. Installs lsd and sets up shell aliases automatically.</div>
+                    <div class="pkg-footer">
+                        <span>Command: <span class="pkg-command">lsd</span></span>
+                        <span>v1.2.0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Help Manual -->
+        <section class="manual-section" id="manual">
+            <h2 class="card-title" style="font-size: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-book-open"></i> Lilith Linux Help Manual</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Read documentation regarding system structure, custom tools, desktop customization configurations, and package orchestration architectures.</p>
+            
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('started', this)">Getting Started</button>
+                <button class="tab-btn" onclick="switchTab('architecture', this)">Distro Architecture</button>
+                <button class="tab-btn" onclick="switchTab('tooling', this)">Custom Tooling</button>
+                <button class="tab-btn" onclick="switchTab('desktop', this)">Splash & Branding</button>
+            </div>
+
+            <!-- Tab Content: Started -->
+            <div class="tab-content active" id="tab-started">
+                <div class="manual-grid">
+                    <div class="manual-item">
+                        <h3>Overview</h3>
+                        <p>Lilith Linux is a customization layer and package environment built on Ubuntu Resolute. It features a security-focused desktop, integrated AI assistants, and a thin meta-repository architecture that eliminates the need to mirror large package binaries.</p>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Keyboard Shortcuts</h3>
+                        <p>Lilith uses optimized workspace shortcuts for navigation:</p>
+                        <ul>
+                            <li><span class="inline-code">Super + T</span>: Open Hyper terminal</li>
+                            <li><span class="inline-code">Super + B</span>: Open HellFire web browser</li>
+                            <li><span class="inline-code">Super + D</span>: Toggle App Launcher</li>
+                            <li><span class="inline-code">Super + Arrow Keys</span>: Snap windows and switch workspaces</li>
+                        </ul>
+                    </div>
+                    <div class="manual-item">
+                        <h3>System Configuration</h3>
+                        <p>Key configuration files are hosted in the following locations:</p>
+                        <ul>
+                            <li>Shell settings: <span class="inline-code">~/.bashrc</span> and <span class="inline-code">~/.config/nushell/</span></li>
+                            <li>Package backends: <span class="inline-code">/etc/lilith/debrep.toml</span></li>
+                            <li>Theme options: <span class="inline-code">/etc/lilith/theme.toml</span></li>
+                        </ul>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Post-Installation Check</h3>
+                        <p>After installing, you can verify your package status and AI integrations by running the verification diagnostic command:</p>
+                        <div class="code-block" style="font-size: 0.8rem; padding: 0.8rem;">lilim doctor<button class="copy-btn" onclick="copyCode(this)"><i class="fa-regular fa-copy"></i></button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Architecture -->
+            <div class="tab-content" id="tab-architecture">
+                <div class="manual-grid">
+                    <div class="manual-item">
+                        <h3>The Redirect Repository Pattern</h3>
+                        <p>Lilith Linux implements a <strong>Redirect Repository (Package Index Overlay)</strong> structure. Instead of replicating gigabytes of package storage locally on private servers, Lilith distributes small, compiled <code>.deb</code> installer scripts (wrapper packages) on GitHub Pages.</p>
+                    </div>
+                    <div class="manual-item">
+                        <h3>How Wrappers Work</h3>
+                        <p>When you run <span class="inline-code">sudo apt install hellfire</span>:</p>
+                        <ul>
+                            <li>APT downloads a lightweight <code>hellfire.deb</code> metadata wrapper package (only 1–2 KB) from the Lilith server.</li>
+                            <li>The wrapper's internal <code>postinst</code> shell script queries the active installer URL from the JSON manifest.</li>
+                            <li>It pulls the compiled browser release from GitHub and unpacks it locally, completely transparent to the user.</li>
+                        </ul>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Hybrid Backend Redirection</h3>
+                        <p>Lilith utilizes the <span class="inline-code">stake</span> backend interface. This allows virtual packages to trigger downstream package installations from diverse providers: APT, Flatpak (Flathub), Pacstall, direct AppImages, or custom source compiles.</p>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Security & Hashes</h3>
+                        <p>All redirect URLs are verified on download using SHA256 signatures embedded in the package definitions, preventing upstream code tampering or supply-chain compromises.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Tooling -->
+            <div class="tab-content" id="tab-tooling">
+                <div class="manual-grid">
+                    <div class="manual-item">
+                        <h3>Stake Utility CLI</h3>
+                        <p><span class="inline-code">stake</span> is the core manager for package redirections. Example commands:</p>
+                        <ul>
+                            <li><span class="inline-code">stake list</span>: Show all active redirects and overrides</li>
+                            <li><span class="inline-code">stake update</span>: Pull new JSON redirect definitions from the remote index</li>
+                            <li><span class="inline-code">stake install [package-name]</span>: Deploy custom wrapper packages</li>
+                        </ul>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Lilim Installer CLI</h3>
+                        <p><span class="inline-code">lilim</span> coordinates system-wide installation configurations and validates dependencies:</p>
+                        <ul>
+                            <li><span class="inline-code">lilim install ai-suite</span>: Configures LLM environments and binds open-interpreter</li>
+                            <li><span class="inline-code">lilim upgrade</span>: Safely updates custom wrappers and theme profiles</li>
+                            <li><span class="inline-code">lilim check-updates</span>: Validates wrapper versions against the overlay server</li>
+                        </ul>
+                    </div>
+                    <div class="manual-item">
+                        <h3>S8n Prompt Enhancer</h3>
+                        <p><span class="inline-code">s8n</span> configures bash terminal behaviors, prompts, coloring schemas, and system status widgets:</p>
+                        <ul>
+                            <li><span class="inline-code">s8n apply-theme</span>: Load the cyber-themed terminal prompt</li>
+                            <li><span class="inline-code">s8n status</span>: View system performance metrics dynamically</li>
+                        </ul>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Vicinae Sync Tool</h3>
+                        <p><span class="inline-code">vicinae</span> handles configuration replication and key syncs across multiple Lilith nodes within a local network.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Desktop -->
+            <div class="tab-content" id="tab-desktop">
+                <div class="manual-grid">
+                    <div class="manual-item">
+                        <h3>Splash Boot Animations</h3>
+                        <p>Lilith replaces default Ubuntu animations system-wide during startup and shutdown:</p>
+                        <ul>
+                            <li><strong>Boot Video</strong>: The full-screen boot screen renders the custom animated <code>lilith-burn-loading.mp4</code>.</li>
+                            <li><strong>Loading Spinner</strong>: The standard Ubuntu loading circle is replaced with the custom animated webm file <code>lilith-spinner.webm</code>.</li>
+                            <li><strong>Branding</strong>: The official Lilith Banner (<code>lilith-banner.png</code>) replaces the "Ubuntu" text.</li>
+                        </ul>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Theme Configuration</h3>
+                        <p>The desktop theme utilizes a <strong>Uniform Glassmorphism</strong> layout. Glass panels with blur backdrops are applied to:</p>
+                        <ul>
+                            <li>Terminal windows and titlebars</li>
+                            <li>App launcher dashboards and popups</li>
+                            <li>Application control panels</li>
+                        </ul>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Custom Typography</h3>
+                        <p>Lilith Linux seeds custom developer fonts out of the box, including Flame Font, Outfit, and JetBrains Mono Nerd Font, applying them to the editor, shell prompt, and system headers.</p>
+                    </div>
+                    <div class="manual-item">
+                        <h3>Desktop Settings Path</h3>
+                        <p>Desktop themes, transparency thresholds, and layout parameters can be customized inside the schema configuration file:</p>
+                        <div class="code-block" style="font-size: 0.8rem; padding: 0.8rem;">/etc/lilith/theme.toml<button class="copy-btn" onclick="copyCode(this)"><i class="fa-regular fa-copy"></i></button></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Lilith Linux Project. All Rights Reserved.</p>
+        <p>Built with <i class="fa-solid fa-heart" style="color: var(--accent-secondary)"></i> using thin redirection layers. Hosted on <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.</p>
+    </footer>
+
+    <!-- Toast Alert for copying -->
+    <div class="alert-toast" id="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Command copied to clipboard!</span>
+    </div>
+
+    <script>
+        function copyCode(btn) {
+            const codeBlock = btn.parentElement;
+            // clone the node to remove the button text from the copied output
+            const clone = codeBlock.cloneNode(true);
+            const button = clone.querySelector('button');
+            if (button) clone.removeChild(button);
+            
+            const textToCopy = clone.textContent.trim();
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        function switchTab(tabId, btn) {
+            // Remove active classes
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active classes
+            btn.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function setCategoryFilter(category, chip) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            
+            filterPackages();
+        }
+
+        function filterPackages() {
+            const searchQuery = document.getElementById('pkgSearch').value.toLowerCase();
+            const activeChip = document.querySelector('.filter-chip.active');
+            let categoryFilter = 'all';
+            
+            if (activeChip) {
+                if (activeChip.textContent.includes('Wrappers')) categoryFilter = 'wrapper';
+                else if (activeChip.textContent.includes('System')) categoryFilter = 'system';
+                else if (activeChip.textContent.includes('GUI')) categoryFilter = 'gui';
+                else if (activeChip.textContent.includes('Developer')) categoryFilter = 'dev';
+            }
+
+            const cards = document.querySelectorAll('.pkg-card');
+            cards.forEach(card => {
+                const name = card.querySelector('.pkg-name').textContent.toLowerCase();
+                const desc = card.querySelector('.pkg-desc').textContent.toLowerCase();
+                const cmd = card.querySelector('.pkg-command').textContent.toLowerCase();
+                const categories = card.getAttribute('data-category').split(' ');
+                
+                const matchesSearch = name.includes(searchQuery) || desc.includes(searchQuery) || cmd.includes(searchQuery);
+                const matchesCategory = categoryFilter === 'all' || categories.includes(categoryFilter);
+                
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
