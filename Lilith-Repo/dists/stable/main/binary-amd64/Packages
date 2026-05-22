@@ -1,0 +1,205 @@
+Package: offerings
+Version: 1.0.2-beta-1
+Architecture: amd64
+Filename: https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.0.2-beta-1_amd64.deb
+Size: 13926644
+SHA256: a54827e36a06fefdb3985fe01089d06e930658112a240212b38a865dea013723
+Maintainer: BlancoBAM
+Description: A unified GUI interface for easy desktop app management designed for Lilith
+Depends: libc6 (>= 2.35), libfontconfig1, libfontconfig1 (>= 2.12.6), libxcb1, libxkbcommon0
+
+Package: tweakers
+Version: 1.0.0-1
+Architecture: amd64
+Filename: https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb
+Size: 4880376
+SHA256: ad6545162d51f7bb631a9ca6b3d5aeecee58a86dec696dac992a4a95ac009592
+Maintainer: Lilith Linux Team <team@lilith-linux.org>
+Description: System optimization and utility tool for Lilith Linux
+Depends: fdupes, fio, libc6 (>= 2.35), libfontconfig1 (>= 2.12.6), polkitd, rclone, sysbench, zenity
+
+Package: lilim
+Version: 0.1.0
+Architecture: amd64
+Filename: https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb
+Size: 1769046614
+SHA256: ae560a3448075a27e5453cf56cc98c042f7b8011fe4a2e961c8413cb9c008b9c
+Maintainer: Lilim Maintainers <maintainer@example.com>
+Description: Lilim component for production-ready AI assistant
+Depends: python3, python3-venv, systemd, libwebkit2gtk-4.0-37 | libwebkit2gtk-4.1-0
+
+Package: stake
+Version: 0.1.0-1
+Architecture: amd64
+Filename: https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb
+Size: 11942372
+SHA256: 849031bd706661ee455d121e69e26f74228872a5a0e5ce9b992f7ae615f10a97
+Maintainer: Stake Maintainers
+Description: Linux desktop UI wrapper around Pake
+Depends: libc6 (>= 2.35)
+
+Package: ouija-pad
+Version: 1.0.0-1
+Architecture: amd64
+Filename: https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb
+Size: 2033212
+SHA256: 364813c68e6fb95e09ae628fc78a46d2259c62935962dd0140e1c096f6b29993
+Maintainer: Lilith Linux Team
+Description: Infernal notepad with ouija board virtual keyboard for Lilith Linux
+Depends: libc6 (>= 2.34), libcairo2 (>= 1.10.0), libgdk-pixbuf-2.0-0 (>= 2.36.9), libglib2.0-0 (>= 2.65.1), libgtk-3-0 (>= 3.21.5), libjavascriptcoregtk-4.1-0, libsoup-3.0-0 (>= 3.0.3), libwebkit2gtk-4.1-0 (>= 2.41.90)
+
+Package: topgrade
+Version: 17.5.0
+Architecture: amd64
+Filename: https://github.com/topgrade-rs/topgrade/releases/download/v17.5.0/topgrade_17.5.0_amd64.deb
+Size: 2747404
+SHA256: 91653887677ff88d0eb9f3bcecbe19f105dc174bc54739f922503491c608901d
+Maintainer: Chris Gelatt <kreeblah@gmail.com>
+Description: Upgrade all the things
+Depends: libc6 (>= 2.34)
+
+Package: lsd
+Version: 1.2.0
+Architecture: amd64
+Filename: https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd_1.2.0_amd64.deb
+Size: 1385024
+SHA256: b212d4c941fa0960c44d94d44039645802a5b7cc8554900e4d53bab5b2574f07
+Maintainer: Peltoche <peltoche@halium.fr>
+Description: An ls command with a lot of pretty colors.
+
+Package: zoxide
+Version: 0.9.9-1
+Architecture: amd64
+Filename: https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb
+Size: 462452
+SHA256: 5ab14485571b00a2cd0d1f2e910f6bcd57ab4da59e4c9e974a9530c3d8ba23a3
+Maintainer: Ajeet D'Souza <98ajeet@gmail.com>
+Description: A smarter cd command for your terminal
+Depends: 
+
+Package: bat
+Version: 0.26.1
+Architecture: amd64
+Filename: https://github.com/sharkdp/bat/releases/download/v0.26.1/bat_0.26.1_amd64.deb
+Size: 3037592
+SHA256: ad59954aa1540e526f97267f60557ea5ef4c7dcf91a0811254134537cb353a3c
+Maintainer: David Peter <mail@david-peter.de>
+Description: cat(1) clone with wings.
+
+Package: s8n-system
+Version: 0.1.3
+Architecture: amd64
+Filename: pool/main/s8n-system_0.1.3_amd64.deb
+Size: 706
+SHA256: bcd0d7b78793060e8344c36ac6ec11aad0ecc1803f590ac975b6bb196750e071
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Lilith System Package Manager CLI wrapper (Wrapper)
+
+Package: browseros
+Version: 0.42.0
+Architecture: amd64
+Filename: pool/main/browseros_0.42.0_amd64.deb
+Size: 860
+SHA256: 70855c52e75211e2441522224c087d078477b27953cc1630f2a51edda7e6bdfd
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Lilith Default Web Browser OS AppImage (Wrapper)
+
+Package: hyper-terminal
+Version: 3.4.1
+Architecture: amd64
+Filename: pool/main/hyper-terminal_3.4.1_amd64.deb
+Size: 856
+SHA256: ae643656afa26faa7ae94c41d56ba9df286eb0ab463300e112e1ddad8573c65b
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Hyper terminal emulator for Lilith Linux (Wrapper)
+
+Package: vicinae
+Version: 0.21.0
+Architecture: amd64
+Filename: pool/main/vicinae_0.21.0_amd64.deb
+Size: 852
+SHA256: a3bc04257681bee036ea6476b8eec7d92e538ef3938e312a8a1e2a6e7b4b4a3f
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Vicinae Visual Workspace AppImage (Wrapper)
+
+Package: lilith-tts
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/main/lilith-tts_1.0.0_amd64.deb
+Size: 744
+SHA256: fc7e733e2694618d8c8b332ce7344b24c5f11aa2225b9688ba4bd47d6c314097
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Text-to-Speech Engine (Wrapper)
+
+Package: hellfire
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/main/hellfire_1.0.0_amd64.deb
+Size: 728
+SHA256: e2bc9c83d8a06303a30219e38c23838dda6bba6f2a1027f0e38bccc075af4e8b
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: HellFire Distro Tool (Wrapper)
+
+Package: soar
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/main/soar_1.0.0_amd64.deb
+Size: 654
+SHA256: 4a161373ce0c9db067d721f7f715bdb27af26979d6eaa2a3ee24b985820b57a7
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Soar Package Manager wrapper (Wrapper)
+
+Package: astral-uv
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/main/astral-uv_1.0.0_amd64.deb
+Size: 640
+SHA256: 06835211efcb1fbb0c812c54f35e61108fc8afd244084d603e5dc58c606a39cf
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Astral uv python package manager wrapper (Wrapper)
+
+Package: pacstall-wrapper
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/main/pacstall-wrapper_1.0.0_amd64.deb
+Size: 682
+SHA256: 32e464314d1b2e32ce10a8483777456d08c18955a7189ae99cdfed76e14f54cc
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Pacstall Package Manager wrapper (Wrapper)
+
+Package: fluent-icon-theme-installer
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/main/fluent-icon-theme-installer_1.0.0_amd64.deb
+Size: 672
+SHA256: 65ac2627e53dcf74dd5e7d52859d80564731b34d28ddc500bc2cb8e009a15627
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Fluent icon theme installer wrapper (Wrapper)
+
+Package: pling-store-wrapper
+Version: 5.0.2
+Architecture: amd64
+Filename: pool/main/pling-store-wrapper_5.0.2_amd64.deb
+Size: 734
+SHA256: 459fb7a589c7ff4ad128e77fd272a0534d78620bd2f40e14af72fcc3866a0aa7
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Pling-Store Client wrapper (Wrapper)
+
+Package: script-kit-wrapper
+Version: 3.45.1
+Architecture: amd64
+Filename: pool/main/script-kit-wrapper_3.45.1_amd64.deb
+Size: 752
+SHA256: a9a154211b5f9662a2893a303ad5f27645703c03786e838f63d046b29d747118
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Script-Kit Desktop Application wrapper (Wrapper)
+
+Package: cosmic-uniform-glass-theme-installer
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/main/cosmic-uniform-glass-theme-installer_1.0.0_amd64.deb
+Size: 688
+SHA256: 4dc3cccce294ccc6c9754613166a716d7982ff78f29eaefa41c383d4913ffbf4
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Cosmic Uniform Glass Theme installer (Wrapper)
+

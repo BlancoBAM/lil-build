@@ -1,0 +1,63 @@
+Package: ferdium
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/xtra/ferdium_1.0.0_amd64.deb
+Size: 738
+SHA256: ad392774f1a5e94238c788f93fce72e131df36f40ef2140930be861bf3ad3c5f
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Ferdium Desktop multi-service visual app (Wrapper)
+
+Package: nixite
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/xtra/nixite_1.0.0_amd64.deb
+Size: 652
+SHA256: b9ff2e77ba3bfbcc914e510e344c0373481c9a33d3400689ba265bd9f49ea8a0
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Nixite Text Editor (Wrapper)
+
+Package: linuxtoys
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/xtra/linuxtoys_1.0.0_amd64.deb
+Size: 662
+SHA256: 3b5d62285fd14b401771641198e1002dc6f044ecb1b165c1f8b43144701efc42
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Collection of toys for terminal (Wrapper)
+
+Package: homepage
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/xtra/homepage_1.0.0_amd64.deb
+Size: 664
+SHA256: 684dafbb0acb8e8cd027786391bcdbe3960fa23a585260c5b8c4f0842f0c6fb3
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Homepage browser start page dashboard (Wrapper)
+
+Package: bashsenpai
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/xtra/bashsenpai_1.0.0_amd64.deb
+Size: 664
+SHA256: 342b20bf6f6b948f2f85fe96a9ba250778985e67aea6dfa5eb7bcfc43976c8c8
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: BashSenpai Terminal AI assistant (Wrapper)
+
+Package: open-interpreter
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/xtra/open-interpreter_1.0.0_amd64.deb
+Size: 672
+SHA256: d1fa5420c2e08d07cc8e0b23b1cdc3662c98a1550b3afd8cce5e0848d171623a
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Open Interpreter local AI agent executor (Wrapper)
+
+Package: keygeist
+Version: 1.0.0
+Architecture: amd64
+Filename: pool/xtra/keygeist_1.0.0_amd64.deb
+Size: 664
+SHA256: dc000a4020471bc7a2b5174997ceb0099c27b58af6732512e1d2722b5b4bcef4
+Maintainer: Lilith Linux Developer <packages@lilithlinux.org>
+Description: Keygeist SSH agent UI manager (Wrapper)
+

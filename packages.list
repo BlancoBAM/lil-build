@@ -1,0 +1,66 @@
+# Lilith Linux Repository - Simplified Package List
+# For use with build_lilith_repo.py
+# Format: source|package|component|description
+
+# === LILITH CORE COMPONENTS (Main Component - Installed by Default) ===
+local|offerings|main|Unified package manager GUI
+local|tweakers|main|System optimization and tweaks
+local|lilim|main|AI Assistant with persistent memory
+local|s8n-system|main|Lilith System Package Manager CLI wrapper
+local|lilith-tts|main|Text-to-Speech Engine
+local|stake|main|Lilith Stake CLI tool
+local|ouija-pad|main|Simple text editor
+local|browseros|main|Lilith Default Web Browser OS AppImage
+local|hyper-terminal|main|Hyper terminal emulator for Lilith Linux
+local|hellfire|main|HellFire Distro Tool
+local|vicinae|main|Vicinae Visual Workspace AppImage
+local|soar|main|Soar Package Manager wrapper
+local|astral-uv|main|Astral uv python package manager wrapper
+local|pacstall-wrapper|main|Pacstall Package Manager wrapper
+local|fluent-icon-theme-installer|main|Fluent icon theme installer wrapper
+local|pling-store-wrapper|main|Pling-Store Client wrapper
+local|script-kit-wrapper|main|Script-Kit Desktop Application wrapper
+local|cosmic-uniform-glass-theme-installer|main|Cosmic Uniform Glass Theme installer
+
+# === LILITH RECOMMENDED EXTRA COMPONENTS (Xtra Component - Curated Optional) ===
+local|ferdium|xtra|Ferdium Desktop multi-service visual app
+local|nixite|xtra|Nixite Text Editor
+local|linuxtoys|xtra|Collection of toys for terminal
+local|homepage|xtra|Homepage browser start page dashboard
+local|bashsenpai|xtra|BashSenpai Terminal AI assistant
+local|open-interpreter|xtra|Open Interpreter local AI agent executor
+local|keygeist|xtra|Keygeist SSH agent UI manager
+local|waveterm|xtra|Waveterm visual terminal emulator
+local|webi-installers|xtra|Webi easy terminal installer package
+local|lux-wine|xtra|Lux Wine integration wrapper
+local|startwine-launcher|xtra|StartWine Wine Launcher GUI
+local|icebreaker|xtra|Icebreaker system diagnostic utility
+local|rustation|xtra|Rustation PlayStation emulator
+local|noctua|xtra|Noctua dark mode web app dashboard
+local|super-stt|xtra|Super-STT speech transcription offline service
+local|subscribi|xtra|Subscribi subscription GUI manager
+local|espanso-gui|xtra|Espanso text expander GUI
+local|lotti|xtra|Lotti system indicator and widgets app
+local|brief|xtra|Brief markdown editing app
+local|wonderpen|xtra|Wonderpen professional writing editor
+local|digikam|xtra|Digikam photography asset management software
+local|spacedrive|xtra|Spacedrive cross-platform file explorer
+
+# === SYSTEM DEPENDENCIES ===
+apt|build-essential|main|Build tools
+apt|cargo|main|Rust package manager
+apt|rustc|main|Rust compiler
+apt|libssl-dev|main|SSL development files
+apt|pkg-config|main|Package configuration tool
+apt|libwayland-dev|main|Wayland development files
+apt|libseat-dev|main|Seat management library
+apt|libxkbcommon-dev|main|XKB common library
+apt|libinput-dev|main|Input device library
+apt|libgtk-3-dev|main|GTK3 development files
+apt|libfontconfig1-dev|main|Font configuration development
+apt|libxcb1-dev|main|XCB development files
+apt|cmake|main|CMake build system
+apt|nodejs|main|JavaScript runtime
+apt|flatpak|main|Flatpak application sandbox support
+apt|gnome-software-plugin-flatpak|main|Software center flatpak plugin
+apt|libfuse2t64|main|FUSE 2 filesystem support library

@@ -1,0 +1,107 @@
+{
+  "build_date": "2026-05-21T00:17:17Z",
+  "artifacts": [
+    {
+      "name": "BlancoBAM/Offerings",
+      "url": "https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.1.0-1_amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/offerings_1.1.0-1_amd64.deb",
+      "sha256": "cf3c68d1e7aa3b6acc45d8ed520683d3e9200190a2892575bcd587944e034f5f"
+    },
+    {
+      "name": "BlancoBAM/Tweakers",
+      "url": "https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/tweakers-v1.0.1-amd64.deb",
+      "sha256": "ad6545162d51f7bb631a9ca6b3d5aeecee58a86dec696dac992a4a95ac009592"
+    },
+    {
+      "name": "BlancoBAM/Stake",
+      "url": "https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/stake-v0.2.3-amd64.deb",
+      "sha256": "849031bd706661ee455d121e69e26f74228872a5a0e5ce9b992f7ae615f10a97"
+    },
+    {
+      "name": "BlancoBAM/Ouija-Pad",
+      "url": "https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/ouija-pad_1.1.0_amd64.deb",
+      "sha256": "364813c68e6fb95e09ae628fc78a46d2259c62935962dd0140e1c096f6b29993"
+    },
+    {
+      "name": "BlancoBAM/Lilim",
+      "url": "https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/lilim_0.1.0_amd64.deb",
+      "sha256": "ae560a3448075a27e5453cf56cc98c042f7b8011fe4a2e961c8413cb9c008b9c"
+    },
+    {
+      "name": "sharkdp/bat",
+      "url": "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat-musl_0.26.1_musl-linux-amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/bat-musl_0.26.1_musl-linux-amd64.deb",
+      "sha256": "e2b709e7330e5e0e2b18924ebdd741f4a1e82265a2336a153f8db82567135d94"
+    },
+    {
+      "name": "lsd-rs/lsd",
+      "url": "https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd-musl_1.2.0_amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/lsd-musl_1.2.0_amd64.deb",
+      "sha256": "ae5eccbc889c274224deffe70668bc6e6282ce8debc6760da2cad22ca738964f"
+    },
+    {
+      "name": "ajeetdsouza/zoxide",
+      "url": "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/zoxide_0.9.9-1_amd64.deb",
+      "sha256": "5ab14485571b00a2cd0d1f2e910f6bcd57ab4da59e4c9e974a9530c3d8ba23a3"
+    },
+    {
+      "name": "sharkdp/fd",
+      "url": "https://github.com/sharkdp/fd/releases/download/v10.4.2/fd-musl_10.4.2_amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/fd-musl_10.4.2_amd64.deb",
+      "sha256": "a8d10259388c32f9aafd65fb65b6e3e2d2782043bed687112f50e2c4cf000c27"
+    },
+    {
+      "name": "BurntSushi/ripgrep",
+      "url": "https://github.com/BurntSushi/ripgrep/releases/download/15.1.0/ripgrep_15.1.0-1_amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/ripgrep_15.1.0-1_amd64.deb",
+      "sha256": "62ce186675c71edbc7c48a67dc36f986974551354d6ce63726adc2d85aad802c"
+    },
+    {
+      "name": "topgrade-rs/topgrade",
+      "url": "https://github.com/topgrade-rs/topgrade/releases/download/v17.5.1/topgrade_17.5.1_amd64.deb",
+      "dest": "/home/aegon/lil-build/staging/debs/topgrade_17.5.1_amd64.deb",
+      "sha256": "2cf86e65c958e68796f08fab4c984a909a0be485ba6987ca5545caf4452c0bf9"
+    },
+    {
+      "name": "Vicinae.AppImage",
+      "url": "https://github.com/vicinaehq/vicinae/releases/download/v0.21.0/Vicinae-x86_64.AppImage",
+      "dest": "/home/aegon/lil-build/staging/appimages/Vicinae.AppImage",
+      "sha256": "37ec3cc52f98f045cd0d5708ae49158b9cbe970ed1c9ffe5dca958ae9a57b74e"
+    },
+    {
+      "name": "Hyper.AppImage",
+      "url": "https://raw.githubusercontent.com/BlancoBAM/Lilith-Linux/main/Hyper-3.4.1.AppImage",
+      "dest": "/home/aegon/lil-build/staging/appimages/Hyper.AppImage",
+      "sha256": "40cbaec131da2fdd68a42d6f197684de3f346162b97a49548458a5c3eb5cc65e"
+    },
+    {
+      "name": "BrowserOS.AppImage",
+      "url": "https://raw.githubusercontent.com/BlancoBAM/Lilith-Linux/main/BrowserOS_v0.42.0.1_x64.AppImage",
+      "dest": "/home/aegon/lil-build/staging/appimages/BrowserOS.AppImage",
+      "sha256": "c7dcdc933a1bf104663fdb973cfaf3883c872ae83908ed82df63b1726b2d6d60"
+    },
+    {
+      "name": "Lilith-TTS",
+      "url": "https://github.com/BlancoBAM/Lilith-TTS",
+      "dest": "/home/aegon/lil-build/staging/binaries/lilith-tts",
+      "sha256": "bc074c8942442c68d32d52abbc767acb67d90e22dd31335262653dc0727506e3"
+    },
+    {
+      "name": "Shapeshifter",
+      "url": "https://github.com/BlancoBAM/Shapeshifter",
+      "dest": "/home/aegon/lil-build/staging/binaries/shapeshifter",
+      "sha256": "c28f596d7bd4d6be8df134dc827bb95a5e450bdb066752b5edb5eb6743b4a7b4"
+    },
+    {
+      "name": "cosmic-app-library",
+      "url": "https://github.com/pop-os/cosmic-app-library",
+      "dest": "/home/aegon/lil-build/staging/binaries/cosmic-app-library",
+      "sha256": "1d2b414e5d6eb0ce76bbb54e61102b9021f2f15d6cd67188f6c7e65415f046ab"
+    }
+  ]
+}

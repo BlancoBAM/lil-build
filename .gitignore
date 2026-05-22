@@ -1,0 +1,16 @@
+# GitHub File Size Limits
+staging/debs/lilim_0.1.0_amd64.deb
+staging/appimages/Vicinae.AppImage
+
+# Build Artifacts & Binaries
+staging/binaries/
+staging/build/
+*.log
+
+# Optional: You might want to ignore all debs/appimages if they are generated
+# staging/debs/
+# staging/appimages/
+
+# System files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,174 @@
+# Lilith Linux Package Repository Specification
+# Based on debrepbuild format from Pop!OS
+#
+# This file specifies all packages and upstream sources for the Lilith Linux repository.
+# It supports automatic syncing and redirects.
+
+[repository]
+name = "Lilith Linux"
+description = "Lilith Linux Package Repository"
+architectures = ["amd64"]
+signing_key = "packages@lilithlinux.org"
+
+# Distribution configuration
+[distribution]
+name = "stable"
+codename = "stable"
+version = "1.0.0"
+
+# Components available in this distribution
+components = ["main", "xtra", "multiverse", "universe"]
+
+# =============================================================================
+# UPSTREAM REPOSITORY SOURCES
+# =============================================================================
+[upstream_sources]
+# Ubuntu Resolute Raccoon (26.04) base
+[upstream_sources.ubuntu_resolute]
+type = "apt-mirror"
+url = "http://archive.ubuntu.com/ubuntu/"
+distribution = "resolute"
+components = ["main", "universe", "multiverse", "restricted"]
+sync_interval = "daily"
+priority = 100
+
+# Pop!OS COSMIC PPA
+[upstream_sources.hepp3n_cosmic]
+type = "ppa"
+url = "ppa:hepp3n/cosmic-epoch"
+sync_interval = "weekly"
+priority = 95
+
+# =============================================================================
+# LILITH LINUX CORE PACKAGES (Main Component)
+# =============================================================================
+[sources]
+
+# Prebuilt DEB Redirects (Hosted on GitHub Releases)
+[lilith_packages.main.offerings]
+source = "redirect"
+upstream = "https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.0.2-beta-1_amd64.deb"
+description = "Unified package manager GUI"
+depends = ["libfontconfig1", "libxcb1", "libxkbcommon0", "libssl3"]
+
+[lilith_packages.main.tweakers]
+source = "redirect"
+upstream = "https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb"
+description = "System optimization and tweaks"
+depends = ["libfontconfig1", "libxcb1", "libgtk-3-0"]
+
+[lilith_packages.main.lilim]
+source = "redirect"
+upstream = "https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb"
+description = "AI Assistant with persistent memory"
+depends = ["python3", "python3-pip", "nodejs"]
+
+[lilith_packages.main.stake]
+source = "redirect"
+upstream = "https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb"
+description = "CLI package manager wrapper"
+depends = ["libssl3"]
+
+[lilith_packages.main.ouija-pad]
+source = "redirect"
+upstream = "https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb"
+description = "Lilith default text editor GUI"
+depends = ["libwebkit2gtk-4.1-0"]
+
+[lilith_packages.main.topgrade]
+source = "redirect"
+upstream = "https://github.com/topgrade-rs/topgrade/releases/download/v17.5.0/topgrade_17.5.0_amd64.deb"
+description = "Upgrades everything"
+
+[lilith_packages.main.lsd]
+source = "redirect"
+upstream = "https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd_1.2.0_amd64.deb"
+description = "ls replacement"
+
+[lilith_packages.main.zoxide]
+source = "redirect"
+upstream = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb"
+description = "Smart cd"
+
+[lilith_packages.main.bat]
+source = "redirect"
+upstream = "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat_0.26.1_amd64.deb"
+description = "cat replacement with syntax highlighting"
+
+# Wrapper Packages built dynamically
+[lilith_packages.main.s8n-system]
+source = "wrapper"
+upstream = "https://github.com/BlancoBAM/S8n-System/releases/download/v0.1.3/s8n-linux-amd64"
+description = "Lilith System Package Manager CLI wrapper"
+
+[lilith_packages.main.browseros]
+source = "wrapper"
+upstream = "https://github.com/BlancoBAM/Lilith-Linux/blob/main/BrowserOS_v0.42.0.1_x64.AppImage"
+description = "Lilith Default Web Browser OS AppImage"
+
+[lilith_packages.main.hyper-terminal]
+source = "wrapper"
+upstream = "https://github.com/BlancoBAM/Lilith-Linux/blob/main/Hyper-3.4.1.AppImage"
+description = "Hyper terminal emulator for Lilith Linux"
+
+[lilith_packages.main.hellfire]
+source = "wrapper"
+upstream = "https://github.com/CYFARE/HellFire"
+description = "HellFire Distro Tool"
+
+[lilith_packages.main.vicinae]
+source = "wrapper"
+upstream = "https://github.com/vicinaehq/vicinae/releases/download/v0.21.0/Vicinae-x86_64.AppImage"
+description = "Vicinae Visual Workspace AppImage"
+
+[lilith_packages.main.lilith-tts]
+source = "wrapper"
+upstream = "https://github.com/BlancoBAM/Lilith-TTS"
+description = "Text-to-Speech Engine"
+
+# =============================================================================
+# LILITH OPTIONAL RECOMMENDED CURATED PACKAGES (Xtra Component)
+# =============================================================================
+[lilith_packages.xtra.ferdium]
+source = "wrapper"
+upstream = "https://github.com/ferdium/ferdium-app/releases/download/v7.1.2/Ferdium-linux-Portable-7.1.2-x86_64.AppImage"
+description = "Ferdium Desktop multi-service visual app"
+
+[lilith_packages.xtra.nixite]
+source = "wrapper"
+upstream = "https://github.com/aspizu/nixite"
+description = "Nixite Text Editor"
+
+[lilith_packages.xtra.linuxtoys]
+source = "wrapper"
+upstream = "https://github.com/psygreg/linuxtoys"
+description = "Collection of toys for terminal"
+
+[lilith_packages.xtra.homepage]
+source = "wrapper"
+upstream = "https://github.com/gethomepage/homepage"
+description = "Homepage browser start page dashboard"
+
+[lilith_packages.xtra.bashsenpai]
+source = "wrapper"
+upstream = "https://github.com/BashSenpai/cli"
+description = "BashSenpai Terminal AI assistant"
+
+[lilith_packages.xtra.open-interpreter]
+source = "wrapper"
+upstream = "https://github.com/openinterpreter/open-interpreter"
+description = "Open Interpreter local AI agent executor"
+
+[lilith_packages.xtra.keygeist]
+source = "wrapper"
+upstream = "https://github.com/mudler/Keygeist"
+description = "Keygeist SSH agent UI manager"
+
+# =============================================================================
+# BUILD CONFIGURATION
+# =============================================================================
+[build]
+jobs = 4
+build_dir = "/tmp/lilith-build"
+output_dir = "/home/aegon/Lilith-Repo"
+sign = false

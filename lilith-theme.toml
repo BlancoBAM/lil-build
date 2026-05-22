@@ -1,0 +1,69 @@
+# Lilith Linux Theme Configuration
+# Fluent-icon-theme and dark mode setup
+
+# Install Fluent-icon-theme (from vinceliuice)
+# https://github.com/vinceliuice/Fluent-icon-theme
+
+[icons]
+# Default icon theme
+default = "Fluent-dark"
+
+# Available themes after installation:
+# - Fluent (auto light/dark)
+# - Fluent-dark
+# - Fluent-light
+
+[theme]
+# GTK theme for dark mode
+gtk_theme = "Fluent-dark"
+
+# Icon theme
+icon_theme = "Fluent-dark"
+
+# Cursor theme
+cursor_theme = "breeze_cursors"
+
+# Color scheme (for COSMIC)
+[colors]
+# Dark mode by default
+scheme = "dark"
+
+# Accent colors
+accent = "#7C3AED"  # Purple accent
+
+# Background colors
+background = "#1E1E1E"
+surface = "#2D2D2D"
+surface_variant = "#3D3D3D"
+
+# Text colors
+on_background = "#FFFFFF"
+on_surface = "#E0E0E0"
+
+# Desktop settings for COSMIC
+[desktop.cosmic]
+# Enable dark mode
+dark_mode = true
+
+# Desktop background
+background = "/usr/share/backgrounds/lilith/default.jpg"
+
+# Show desktop icons
+show_desktop_icons = false
+
+# Dock/panel settings
+panel_autohide = true
+dock_position = "bottom"
+
+# Fonts
+[fonts]
+# System font
+sans = "Inter"
+mono = "JetBrains Mono"
+
+# Font sizes
+font_size = 11
+font_size_small = 10
+
+# DPI scaling
+dpi_scaling = 1.0

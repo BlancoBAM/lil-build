@@ -1,0 +1,79 @@
+# Lilith Linux Topgrade Configuration
+# https://github.com/topgrade-rs/topgrade
+
+# Configuration for topgrade to work with Lilith Linux
+# This file should be at ~/.config/topgrade.toml or /etc/topgrade.toml
+
+# General settings
+[general]
+# Don't prompt for confirmation
+skip_prompts = true
+
+# Pre-command hook (Lilith-specific)
+# pre_sudo = ["echo 'Lilith Linux System Update'"]
+
+# Paths to ignore
+# ignore_failures = true
+
+[linux]
+# Package managers to use
+package_managers = [
+    "apt",
+    "flatpak",
+    "snap",
+    # "pacstall",  # Uncomment if pacstall is installed
+]
+
+# Rust package managers
+# cargo_cleanup = true
+# rustup_update = true
+
+# System package managers
+# emacs_package_update = true
+# vim_package_update = true
+
+[windows]
+# WSL-specific settings (if using WSL)
+# wsl_update = true
+
+# Tmux
+# tmux_update_plugins = true
+
+[macos]
+# Homebrew
+# brew_update = true
+# brew_upgrade = true
+
+# App Store
+# mas_update = true
+
+# Ruby
+# gem_update = true
+
+[freebsd]
+# pkg_update = true
+
+# Custom commands (Lilith-specific)
+[commands]
+# These run before/after updates
+# "echo 'Starting Lilith Linux system update...'" 
+
+# Flatpak
+[flatpak]
+# Use -y flag
+# remote_flathub = true
+
+# Snap
+[snap]
+# Classic confinement
+# classic_confine = true
+
+# Notes
+# This configuration ensures topgrade updates:
+# - apt packages (Ubuntu/Debian base)
+# - flatpak applications
+# - snap packages
+# - rust/cargo packages (if installed)
+# - system components
+#
+# The s8n upd8 command uses topgrade when available

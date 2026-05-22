@@ -1,0 +1,8 @@
+# Ignore large binary artifacts in staging
+debs/
+appimages/
+binaries/
+build/
+*.deb
+*.AppImage
+*.log

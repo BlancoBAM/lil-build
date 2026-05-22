@@ -1,0 +1,70 @@
+https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.0.2-beta-1_amd64.deb (curl -fsSL https://raw.githubusercontent.com/BlancoBAM/Offerings/main/install.sh | bash)
+https://github.com/BlancoBAM/S8n-System/releases/download/v0.1.3/s8n-linux-amd64
+https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb
+https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb
+https://github.com/BlancoBAM/Lilith-TTS
+https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb
+https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb
+https://github.com/BlancoBAM/Lilith-Linux/blob/main/BrowserOS_v0.42.0.1_x64.AppImage
+https://github.com/BlancoBAM/Lilith-Linux/blob/main/Hyper-3.4.1.AppImage (~/hyper_setup_backup.js && ~/hyper_backup)
+https://github.com/CYFARE/HellFire
+https://github.com/vicinaehq/vicinae/releases/download/v0.21.0/Vicinae-x86_64.AppImage
+https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd_1.2.0_amd64.deb
+https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb
+https://github.com/nushell/nushell/
+https://github.com/sharkdp/bat/releases/download/v0.26.1/bat_0.26.1_amd64.deb
+https://github.com/sharkdp/fd
+https://github.com/lotabout/skim
+https://github.com/uutils/coreutils
+https://github.com/dalance/procs
+https://github.com/ismaelgv/rnr
+https://github.com/nivekuil/rip
+https://github.com/orhun/systeroid
+https://github.com/denisidoro/navi
+https://github.com/dbrgn/tealdeer
+https://github.com/starship/starship
+https://github.com/BurntSushi/ripgrep
+https://github.com/casey/just
+https://github.com/JuanJMarques/shred-rust
+https://fonts.google.com/share?selection.family=Noto+Color+Emoji
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/SergioRibera/Simplemoji/releases/download/v1.2.4/simplemoji-installer.sh | sh
+https://github.com/qarmin/czkawka
+popdev:frosted-glass
+ppa:hepp3n/cosmic-epoch
+https://releases.ubuntu.com/resolute/ubuntu-26.04-desktop-amd64.list
+https://github.com/pkgforge/soar (curl -fsSL "https://raw.githubusercontent.com/pkgforge/soar/main/install.sh" | sh)
+sudo apt install flatpak && sudo apt install gnome-software-plugin-flatpak && flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+sudo apt install libfuse2t64
+curl -LsSf https://astral.sh/uv/install.sh | sh
+sudo bash -c "$(curl -fsSL https://pacstall.dev/q/install)"
+npm install -g npm@latest
+npm install -g @google/gemini-cli
+https://github.com/vinceliuice/Fluent-icon-theme
+https://github.com/topgrade-rs/topgrade/releases/download/v17.5.0/topgrade_17.5.0_amd64.deb
+flatpak install flathub com.github.ilai_deutel.kibi
+https://github.com/ilai-deutel/kibi
+https://ocs-dl.fra1.cdn.digitaloceanspaces.com/data/files/1673754093/pling-store-5.0.2-1-x86-64.AppImage?response-content-disposition=attachment%3B%2520pling-store-5.0.2-1-x86-64.AppImage&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=RWJAQUNCHT7V2NCLZ2AL%2F20260517%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260517T153721Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Signature=d95b51914c60215b232ce05931a5508c124f5110c3cbf8348959a99e2caed664
+https://github.com/tarka/xcp
+https://github.com/skim-rs/skim
+https://github.com/atuinsh/atuin
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+https://release-assets.githubusercontent.com/github-production-release-asset/328074521/089356be-972e-42f5-8ced-f16f5bcad097?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-05-17T16%3A49%3A36Z&rscd=attachment%3B+filename%3DScript-Kit-Linux-3.45.1-x86_64.AppImage&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-05-17T15%3A49%3A34Z&ske=2026-05-17T16%3A49%3A36Z&sks=b&skv=2018-11-09&sig=SfZlbK22SZjrd1QA%2BTSbq86JmVfO6t9IA3Jhoy%2BAL8w%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc3OTAzNjkzNiwibmJmIjoxNzc5MDMzMzM2LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.HQikC-ZUG5GyhV_70zADy-En3rh_RrGLb9vIdtuftyY&response-content-disposition=attachment%3B%20filename%3DScript-Kit-Linux-3.45.1-x86_64.AppImage&response-content-type=application%2Foctet-stream
+https://github.com/xarbit/cosmic-uniform-glass-theme
+https://github.com/phiresky/ripgrep-all
+https://github.com/gtk-rs/gtk-rs-core
+https://github.com/cosmic-utils/app-hub
+https://github.com/pop-os/cosmic-app-library
+https://github.com/pop-os/cosmic-applets
+https://github.com/lucas-dclrcq/awesome-pop-launcher
+https://github.com/cosmic-utils/wizard
+https://github.com/cosmic-utils/clipboard-manager
+https://github.com/cosmic-utils/cosmic-connect-applet
+https://github.com/cosmic-utils/accounts
+https://github.com/cosmic-utils/cosmic-project-collection
+https://github.com/uutils/util-linux
+https://github.com/uutils/findutils
+https://github.com/uutils/hostname
+https://github.com/uutils/coreutils-tracking
+https://github.com/PixelDoted/cosmic-color-picker
+https://github.com/vkhitrin/cosmicding
+https://github.com/cosmic-utils/forecast
