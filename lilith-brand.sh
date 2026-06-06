@@ -198,7 +198,7 @@ if [[ -d "$WALLPAPERS_DIR" ]]; then
 fi
 
 # Set a default wallpaper symlink
-DEFAULT_WALLPAPER="$CHROOT/usr/share/backgrounds/lilith/default.jpg"
+DEFAULT_WALLPAPER="$CHROOT/usr/share/backgrounds/lilith/default.png"
 if ! $DRY_RUN; then
     # Find first jpg/png as default if not already set
     if [[ ! -f "$DEFAULT_WALLPAPER" ]]; then
@@ -238,7 +238,7 @@ RONEOF
     # Background wallpaper
     cat > "$SKEL_COSMIC/com.system76.CosmicBackground/v1/entry" << 'RONEOF'
 (
-    wallpaper_path: "/usr/share/backgrounds/lilith/default.jpg",
+    wallpaper_path: "/usr/share/backgrounds/lilith/default.png",
     scaling_mode: Zoom,
     sampling_filter: Lanczos,
     output: "all",

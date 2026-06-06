@@ -32,7 +32,7 @@ Rectangle {
     Image {
         id: bgImage
         anchors.fill: parent
-        source: "background.jpg"
+        source: "background.webp"
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         opacity: 0.25  // Subtle background - keeps dark flame feel

@@ -61,7 +61,7 @@ success = "#4CAF50"
 dark_mode = true
 
 # Desktop background
-background = "/usr/share/backgrounds/lilith/default.jpg"
+background = "/usr/share/backgrounds/lilith/default.png"
 
 # COSMIC accent color (flame red)
 accent_color = "#C0392B"
@@ -94,7 +94,7 @@ dpi_scaling = 1.0
 # SDDM Login Screen
 [sddm]
 theme = "lilith"
-background = "/usr/share/sddm/themes/lilith/background.jpg"
+background = "/usr/share/sddm/themes/lilith/background.webp"
 accent_color = "#C0392B"
 font = "Inter"
 
