@@ -1,8 +1,6 @@
 # Lilith Linux Theme Configuration
-# Fluent-icon-theme and dark mode setup
-
-# Install Fluent-icon-theme (from vinceliuice)
-# https://github.com/vinceliuice/Fluent-icon-theme
+# Flame/Gothic dark aesthetic — deep black, crimson, infernal orange
+# =============================================================================
 
 [icons]
 # Default icon theme
@@ -20,27 +18,44 @@ gtk_theme = "Fluent-dark"
 # Icon theme
 icon_theme = "Fluent-dark"
 
-# Cursor theme
-cursor_theme = "breeze_cursors"
+# Cursor theme (Lilith custom cursor sets in /usr/share/icons/Lilith/)
+cursor_theme = "Lilith-Default"
 
 # Color scheme (for COSMIC)
 [colors]
 # Dark mode by default
 scheme = "dark"
 
-# Accent colors
-accent = "#7C3AED"  # Purple accent
+# Primary flame accent — ember red
+accent = "#C0392B"
 
-# Background colors
-background = "#1E1E1E"
-surface = "#2D2D2D"
-surface_variant = "#3D3D3D"
+# Secondary accent — infernal orange
+accent_secondary = "#FF6B35"
+
+# Tertiary accent — dark crimson highlight
+accent_tertiary = "#8B1A1A"
+
+# Background colors — deep void black
+background = "#0D0D0D"
+surface = "#161616"
+surface_variant = "#1F1F1F"
+surface_raised = "#242424"
+
+# Border / divider
+border = "#2A1010"
+border_active = "#C0392B"
 
 # Text colors
-on_background = "#FFFFFF"
-on_surface = "#E0E0E0"
+on_background = "#F0E6E6"
+on_surface = "#D4C4C4"
+on_surface_muted = "#8A7070"
 
-# Desktop settings for COSMIC
+# Error / warning
+error = "#FF4444"
+warning = "#FF8C00"
+success = "#4CAF50"
+
+# COSMIC Desktop settings
 [desktop.cosmic]
 # Enable dark mode
 dark_mode = true
@@ -48,18 +63,26 @@ dark_mode = true
 # Desktop background
 background = "/usr/share/backgrounds/lilith/default.jpg"
 
+# COSMIC accent color (flame red)
+accent_color = "#C0392B"
+
 # Show desktop icons
 show_desktop_icons = false
 
 # Dock/panel settings
 panel_autohide = true
 dock_position = "bottom"
+dock_icon_size = 48
+
+# Window gap / tiling
+window_gap = 8
 
 # Fonts
 [fonts]
-# System font
+# System font (Lilith custom fonts take priority if installed)
 sans = "Inter"
 mono = "JetBrains Mono"
+display = "Toxia"
 
 # Font sizes
 font_size = 11
@@ -67,3 +90,33 @@ font_size_small = 10
 
 # DPI scaling
 dpi_scaling = 1.0
+
+# SDDM Login Screen
+[sddm]
+theme = "lilith"
+background = "/usr/share/sddm/themes/lilith/background.jpg"
+accent_color = "#C0392B"
+font = "Inter"
+
+# Plymouth Boot Screen
+[plymouth]
+theme = "lilith-flame"
+logo = "/usr/share/plymouth/themes/lilith-flame/logo.png"
+# Background: deep black
+background_color = "#0D0D0D"
+
+# Calamares Installer
+[calamares]
+branding = "lilith"
+# Primary color — flame red
+color_primary = "#C0392B"
+# Slideshow background
+background_color = "#0D0D0D"
+# Logo
+logo = "/usr/share/calamares/branding/lilith/lilith-logo.png"
+
+# Package Repository
+[repository]
+url = "https://blancobam.github.io/lilith-packages"
+apt_source = "deb [arch=amd64 signed-by=/usr/share/keyrings/lilith-archive-keyring.gpg] https://blancobam.github.io/lilith-packages stable main xtra"
+keyring = "/usr/share/keyrings/lilith-archive-keyring.gpg"

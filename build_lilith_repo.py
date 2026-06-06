@@ -34,7 +34,7 @@ XTRA_FILE = os.path.join(LIL_BUILD, "xtra-pks.txt")
 UBUNTU_LIST = os.path.join(LIL_BUILD, "ubuntu-26.04-desktop-amd64.list")
 MANIFEST_OUT = os.path.join(REPO_ROOT, "lilith-distro-manifest.json")
 MAINTAINER = "BlancoBAM <blancobam@protonmail.com>"
-REPO_URL = "https://packages.lilithlinux.org"
+REPO_URL = "https://blancobam.github.io/lilith-packages"
 
 print("=== Lilith Linux Repository Builder ===")
 print(f"Output: {REPO_ROOT}")
@@ -68,7 +68,7 @@ def download_file(url, dest, label=""):
         return False
 
 def init_dirs():
-    for comp in ["main", "xtra"]:
+    for comp in ["main", "xtra", "desktop"]:
         os.makedirs(os.path.join(REPO_ROOT, "dists/stable", comp, "binary-amd64"), exist_ok=True)
         os.makedirs(os.path.join(REPO_ROOT, "pool", comp), exist_ok=True)
     print("[+] Repository directory structure ready")
@@ -222,7 +222,7 @@ def build_repo_indexes(packages_by_comp):
         f"Codename: stable\n"
         f"Date: {now}\n"
         f"Architectures: amd64\n"
-        f"Components: main xtra\n"
+        f"Components: main xtra desktop\n"
         f"Description: Thin package overlay for Lilith Linux (Ubuntu Resolute base)\n"
         f"SHA256:\n"
     ) + "\n".join(sha256_lines) + "\n"
@@ -240,14 +240,73 @@ def build_repo_indexes(packages_by_comp):
     run_cmd(f"gpg --batch --yes --clearsign --default-key blancobam@protonmail.com -o {inrelease_path} {release_path}")
     run_cmd(f"gpg --batch --yes -abs --default-key blancobam@protonmail.com -o {release_gpg_path} {release_path}")
 
-    print("[+] Repository index files generated and signed successfully!")
+def build_grub_theme_deb():
+    pkg_name = "lilith-grub-theme"
+    version = "1.0.0"
+    desc = "Custom grub2 bootloader theme for Lilith Linux (bundled offline)"
+    
+    build_dir = f"/tmp/lilith-wrapper-{pkg_name}"
+    shutil.rmtree(build_dir, ignore_errors=True)
+    
+    os.makedirs(os.path.join(build_dir, "DEBIAN"), exist_ok=True)
+    dest_dir = os.path.join(build_dir, "usr/share/grub/themes/lilith")
+    os.makedirs(dest_dir, exist_ok=True)
+    
+    src_theme = "/home/aegon/grub2-themes"
+    if os.path.exists(src_theme):
+        for item in ["common", "backgrounds", "config", "install.sh"]:
+            src_item = os.path.join(src_theme, item)
+            dst_item = os.path.join(dest_dir, item)
+            if os.path.isdir(src_item):
+                shutil.copytree(src_item, dst_item)
+            elif os.path.isfile(src_item):
+                shutil.copy2(src_item, dst_item)
+    
+    control = (
+        f"Package: {pkg_name}\nVersion: {version}\nSection: misc\n"
+        f"Priority: optional\nArchitecture: amd64\nMaintainer: {MAINTAINER}\n"
+        f"Description: {desc}\n"
+    )
+    with open(os.path.join(build_dir, "DEBIAN/control"), "w") as f:
+        f.write(control)
+        
+    postinst_script = """#!/usr/bin/env bash
+set -e
+echo "[lilith-grub-theme] Installing grub theme..."
+cd /usr/share/grub/themes/lilith
+bash install.sh -t tela -i color -s 1080p -b || true
+echo "[lilith-grub-theme] Grub theme successfully installed and set!"
+exit 0
+"""
+    with open(os.path.join(build_dir, "DEBIAN/postinst"), "w") as f:
+        f.write(postinst_script)
+    os.chmod(os.path.join(build_dir, "DEBIAN/postinst"), 0o755)
+    
+    output_pool = os.path.join(REPO_ROOT, "pool/main")
+    os.makedirs(output_pool, exist_ok=True)
+    deb_out_path = os.path.join(output_pool, f"{pkg_name}_{version}_amd64.deb")
+    
+    print(f"  [*] Building grub theme deb: {pkg_name}_{version}_amd64.deb")
+    run_cmd(f"dpkg-deb --build {build_dir} {deb_out_path}", check=True)
+    shutil.rmtree(build_dir, ignore_errors=True)
+    
+    size = os.path.getsize(deb_out_path)
+    sha256 = get_sha256(deb_out_path)
+    rel_filename = f"pool/main/{pkg_name}_{version}_amd64.deb"
+    
+    return {
+        "Package": pkg_name, "Version": version,
+        "Architecture": "amd64", "Maintainer": MAINTAINER,
+        "Description": desc,
+        "Size": str(size), "SHA256": sha256, "Filename": rel_filename
+    }
 
 # =============================================================================
 # MAIN
 # =============================================================================
 def main():
     init_dirs()
-    packages_by_comp = {"main": [], "xtra": []}
+    packages_by_comp = {"main": [], "xtra": [], "desktop": []}
 
     # ────────────────────────────────────────────────────────────────────────
     # MAIN COMPONENT — DEB REDIRECTS
@@ -263,11 +322,15 @@ def main():
         ("lsd",        "https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd_1.2.0_amd64.deb"),
         ("zoxide",     "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb"),
         ("bat",        "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat_0.26.1_amd64.deb"),
+        ("shapeshifter", "https://github.com/BlancoBAM/Shapeshifter/releases/download/v2.0.0/shapeshifter_2.0.0_amd64.deb"),
     ]
     for name, url in deb_redirects:
         meta = get_deb_metadata(url, name)
         if meta:
             packages_by_comp["main"].append(meta)
+
+    # Custom Grub theme package
+    packages_by_comp["main"].append(build_grub_theme_deb())
 
     # ────────────────────────────────────────────────────────────────────────
     # MAIN COMPONENT — WRAPPER DEBS
@@ -926,6 +989,149 @@ echo "[flatpak] Flatpak configured with Flathub."
 """,
     ))
 
+    # ── Minimal Desktop Environment Meta-Packages ──
+    print("\n── Minimal DE Meta-Packages ──")
+    de_meta_packages = [
+        ("lilith-plasma", "1.0.0", "Minimal KDE Plasma Desktop Environment for Lilith Linux", "plasma-desktop, sddm, systemsettings, plasma-workspace-wayland", "Plasma"),
+        ("lilith-xfce", "1.0.0", "Minimal XFCE Desktop Environment for Lilith Linux", "xfce4, xfce4-session, xfwm4, xfce4-panel", "XFCE"),
+        ("lilith-lxde", "1.0.0", "Minimal LXDE Desktop Environment for Lilith Linux", "lxde-core, lxsession, openbox", "LXDE"),
+        ("lilith-lxqt", "1.0.0", "Minimal LXQt Desktop Environment for Lilith Linux", "lxqt-core, openbox", "LXQt"),
+        ("lilith-budgie", "1.0.0", "Minimal Budgie Desktop Environment for Lilith Linux", "budgie-desktop, budgie-indicator-applet", "Budgie"),
+        ("lilith-deepin", "1.0.0", "Minimal Deepin Desktop Environment for Lilith Linux", "dde-session-ui, dde-desktop, deepin-wm", "Deepin"),
+        ("lilith-trinity", "1.0.0", "Minimal Trinity Desktop Environment for Lilith Linux", "tde-trinity, tdm", "Trinity"),
+        ("lilith-enlightenment", "1.0.0", "Minimal Enlightenment Desktop Environment for Lilith Linux", "enlightenment, terminology", "Enlightenment"),
+        ("lilith-pantheon", "1.0.0", "Minimal Pantheon Desktop Environment for Lilith Linux", "pantheon-shell, gala, wingpanel, plank", "Pantheon"),
+        ("lilith-gnome", "1.0.0", "Minimal GNOME Desktop Environment for Lilith Linux", "gnome-session, gnome-shell, gnome-control-center", "GNOME"),
+        ("lilith-mate", "1.0.0", "Minimal MATE Desktop Environment for Lilith Linux", "mate-desktop-environment-core", "MATE"),
+        ("lilith-i3", "1.0.0", "Minimal i3 Window Manager for Lilith Linux", "i3-wm, i3status, i3lock, dmenu", "i3"),
+        ("lilith-sway", "1.0.0", "Minimal Sway Window Manager for Lilith Linux", "sway, swaylock, swayidle, swaybg, wmenu", "Sway"),
+    ]
+    for name, version, desc, deps, display_name in de_meta_packages:
+        postinst = f"""
+echo "[{name}] Installed minimal {display_name} Desktop Environment successfully!"
+if command -v update-desktop-database &>/dev/null; then
+    update-desktop-database -q || true
+fi
+"""
+        packages_by_comp["desktop"].append(build_wrapper_deb(
+            name, version, desc, postinst, component="desktop", depends=deps
+        ))
+
+    # ── lilith-welcome — live session welcome app ──────────────────────────────
+    packages_by_comp["desktop"].append(build_wrapper_deb(
+        "lilith-welcome", "1.0.0",
+        "Lilith Linux live-session welcome screen and Calamares installer launcher",
+        r"""
+set -e
+echo "[lilith-welcome] Installing lilith-welcome live welcome app..."
+
+INSTALL_DIR="/usr/share/lilith-welcome"
+BIN_DEST="/usr/bin/lilith-welcome"
+AUTOSTART_DIR="/etc/xdg/autostart"
+CALAMARES_MODULES="/etc/calamares/modules"
+
+# Download the latest lilith-welcome release binary
+WELCOME_URL=$(curl -fsSL https://api.github.com/repos/BlancoBAM/lilith-welcome/releases/latest | \
+    python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+for a in data.get('assets', []):
+    if 'amd64' in a['name'] and a['name'].endswith('.tar.gz'):
+        print(a['browser_download_url']); break
+" 2>/dev/null || echo "")
+
+if [[ -n "$WELCOME_URL" ]]; then
+    TMPD=$(mktemp -d)
+    curl -fsSL -o "$TMPD/lilith-welcome.tar.gz" "$WELCOME_URL"
+    tar -xzf "$TMPD/lilith-welcome.tar.gz" -C "$TMPD"
+    BIN=$(find "$TMPD" -name "lilith-welcome" -type f | head -1)
+    [[ -n "$BIN" ]] && install -Dm755 "$BIN" "$BIN_DEST"
+    # Copy UI assets if bundled
+    ASSETS=$(find "$TMPD" -name "assets" -type d | head -1)
+    if [[ -n "$ASSETS" ]]; then
+        mkdir -p "$INSTALL_DIR/assets"
+        cp -r "$ASSETS/"* "$INSTALL_DIR/assets/"
+        chmod -R 644 "$INSTALL_DIR/assets/"
+        find "$INSTALL_DIR" -type d -exec chmod 755 {} \;
+    fi
+    rm -rf "$TMPD"
+    echo "[lilith-welcome] Binary installed to $BIN_DEST"
+else
+    echo "[lilith-welcome] Could not fetch release — binary must be installed manually"
+fi
+
+# Install .desktop launcher
+mkdir -p /usr/share/applications
+cat > /usr/share/applications/lilith-welcome.desktop << 'DESKTOP'
+[Desktop Entry]
+Name=Lilith Welcome
+GenericName=Welcome Screen
+Comment=Lilith Linux live welcome and installer launcher
+Exec=/usr/bin/lilith-welcome
+Icon=lilith-welcome
+Terminal=false
+Type=Application
+Categories=System;
+Keywords=welcome;lilith;linux;install;calamares;
+StartupNotify=true
+DESKTOP
+chmod 644 /usr/share/applications/lilith-welcome.desktop
+
+# Install live-session guard script
+cat > /usr/sbin/lilith-live-check.sh << 'GUARD'
+#!/usr/bin/env bash
+# Launches lilith-welcome only in Casper/live-boot sessions.
+IS_LIVE=false
+grep -qE "boot=(casper|live)" /proc/cmdline 2>/dev/null && IS_LIVE=true
+[[ -f /usr/share/initramfs-tools/hooks/casper ]] && IS_LIVE=true
+[[ -f /usr/share/initramfs-tools/hooks/live ]] && IS_LIVE=true
+dpkg -s casper &>/dev/null 2>&1 && IS_LIVE=true
+dpkg -s live-boot &>/dev/null 2>&1 && IS_LIVE=true
+[[ -d /cdrom ]] || [[ -d /cow ]] || [[ -d /lib/live ]] && IS_LIVE=true
+CURRENT_USER=$(id -un 2>/dev/null || echo "")
+[[ "$CURRENT_USER" =~ ^(ubuntu|user|casper)$ ]] && IS_LIVE=true
+if [[ "$IS_LIVE" == "true" ]]; then
+    sleep 3; exec /usr/bin/lilith-welcome
+fi
+exit 0
+GUARD
+chmod 755 /usr/sbin/lilith-live-check.sh
+
+# Install live-session XDG autostart entry
+mkdir -p "$AUTOSTART_DIR"
+cat > "$AUTOSTART_DIR/lilith-welcome-live.desktop" << 'AUTOSTART'
+[Desktop Entry]
+Name=Lilith Welcome
+Comment=Lilith Linux welcome screen (live session only)
+Exec=/usr/sbin/lilith-live-check.sh
+Terminal=false
+Type=Application
+Icon=lilith-welcome
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=3
+NotShowIn=KDE;
+AUTOSTART
+chmod 644 "$AUTOSTART_DIR/lilith-welcome-live.desktop"
+
+# Install Calamares post-install cleanup module
+mkdir -p "$CALAMARES_MODULES"
+cat > "$CALAMARES_MODULES/lilith-welcome-cleanup.conf" << 'CALCONF'
+---
+# Removes lilith-welcome live autostart from the installed system
+dontChroot: false
+script:
+    - "-": "rm -f /etc/xdg/autostart/lilith-welcome-live.desktop"
+    - "-": "rm -f /usr/sbin/lilith-live-check.sh"
+    - "-": "update-desktop-database /usr/share/applications/ 2>/dev/null || true"
+CALCONF
+
+update-desktop-database /usr/share/applications/ 2>/dev/null || true
+echo "[lilith-welcome] Installation complete."
+""",
+        component="desktop",
+        depends="curl, python3",
+    ))
+
     # ────────────────────────────────────────────────────────────────────────
     # XTRA COMPONENT — wrapper debs
     # ────────────────────────────────────────────────────────────────────────
@@ -1088,10 +1294,11 @@ echo "[{name}] Done."
         "custom_repository_overlay": {
             "name": "Lilith Custom Repo",
             "url": f"{REPO_URL}/",
-            "apt_source": f"deb [arch=amd64 trusted=yes] {REPO_URL} stable main xtra",
+            "apt_source": f"deb [arch=amd64 trusted=yes] {REPO_URL} stable main xtra desktop",
             "components": {
                 "core": [p["Package"] for p in packages_by_comp["main"]],
-                "xtra": [p["Package"] for p in packages_by_comp["xtra"]]
+                "xtra": [p["Package"] for p in packages_by_comp["xtra"]],
+                "desktop": [p["Package"] for p in packages_by_comp["desktop"]]
             }
         },
         "upstream_ubuntu_resolute_packages": []
@@ -1133,6 +1340,7 @@ echo "[{name}] Done."
     print("\n=== Lilith Repository build complete! ===")
     print(f"  Main packages: {len(packages_by_comp['main'])}")
     print(f"  Xtra packages: {len(packages_by_comp['xtra'])}")
+    print(f"  Desktop packages: {len(packages_by_comp['desktop'])}")
     print(f"  Output: {REPO_ROOT}")
 
 if __name__ == "__main__":

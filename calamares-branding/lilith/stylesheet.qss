@@ -1,0 +1,250 @@
+/* ========================================================================
+   Calamares Installer Stylesheet — Lilith Linux
+   Dark flame aesthetic: deep black background, crimson/orange accents
+   ======================================================================== */
+
+/* Main window */
+QWidget {
+    background-color: #0D0D0D;
+    color: #EEEEEE;
+    font-family: "Inter", "Ubuntu", sans-serif;
+    font-size: 13px;
+}
+
+/* Sidebar / navigation */
+#sidebarApp {
+    background-color: #0A0A0A;
+    border-right: 1px solid #1A1A1A;
+}
+
+#sidebarApp QLabel {
+    color: #BBBBBB;
+    font-size: 12px;
+    padding: 8px 16px;
+}
+
+#sidebarApp QLabel[selected="true"] {
+    color: #E74C3C;
+    font-weight: bold;
+    background-color: #1A0808;
+    border-left: 3px solid #E74C3C;
+}
+
+/* Main content area */
+#panelApp {
+    background-color: #111111;
+    padding: 24px;
+}
+
+/* Step title */
+QLabel#headerLabel {
+    font-size: 22px;
+    font-weight: bold;
+    color: #FFFFFF;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E74C3C;
+}
+
+/* Progress bar */
+QProgressBar {
+    background-color: #1A1A1A;
+    border: 1px solid #2A2A2A;
+    border-radius: 6px;
+    height: 8px;
+    text-align: center;
+    color: transparent;
+}
+
+QProgressBar::chunk {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #C0392B, stop:0.5 #FF6B35, stop:1 #C0392B);
+    border-radius: 6px;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #1A1A1A;
+    color: #CCCCCC;
+    border: 1px solid #333333;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 13px;
+}
+
+QPushButton:hover {
+    background-color: #2A2A2A;
+    border-color: #E74C3C;
+    color: #FFFFFF;
+}
+
+QPushButton:pressed {
+    background-color: #C0392B;
+    color: #FFFFFF;
+}
+
+QPushButton#nextButton, QPushButton#installButton {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #C0392B, stop:1 #E74C3C);
+    color: #FFFFFF;
+    font-weight: bold;
+    border: none;
+}
+
+QPushButton#nextButton:hover, QPushButton#installButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #E74C3C, stop:1 #FF6B35);
+}
+
+/* Text inputs */
+QLineEdit, QTextEdit, QPlainTextEdit {
+    background-color: #1A1A1A;
+    color: #EEEEEE;
+    border: 1px solid #333333;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+QLineEdit:focus, QTextEdit:focus {
+    border-color: #E74C3C;
+}
+
+/* Combo boxes */
+QComboBox {
+    background-color: #1A1A1A;
+    color: #EEEEEE;
+    border: 1px solid #333333;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 24px;
+}
+
+QComboBox::down-arrow {
+    width: 12px;
+    height: 12px;
+    color: #E74C3C;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #1A1A1A;
+    color: #EEEEEE;
+    border: 1px solid #2A2A2A;
+    selection-background-color: #2A0808;
+    selection-color: #E74C3C;
+}
+
+/* Checkboxes */
+QCheckBox {
+    color: #CCCCCC;
+    spacing: 8px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #444444;
+    border-radius: 4px;
+    background-color: #1A1A1A;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #E74C3C;
+    border-color: #E74C3C;
+}
+
+/* Radio buttons */
+QRadioButton {
+    color: #CCCCCC;
+    spacing: 8px;
+}
+
+QRadioButton::indicator {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #444444;
+    border-radius: 9px;
+    background-color: #1A1A1A;
+}
+
+QRadioButton::indicator:checked {
+    background-color: #E74C3C;
+    border-color: #E74C3C;
+}
+
+/* Scroll bars */
+QScrollBar:vertical {
+    background: #111111;
+    width: 8px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #333333;
+    border-radius: 4px;
+    min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #E74C3C;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+/* Partition view */
+#partitionBarView {
+    background-color: #0D0D0D;
+    border: 1px solid #2A2A2A;
+    border-radius: 6px;
+}
+
+/* Tree / list views */
+QTreeView, QListView {
+    background-color: #111111;
+    color: #EEEEEE;
+    border: 1px solid #2A2A2A;
+    border-radius: 6px;
+    alternate-background-color: #141414;
+}
+
+QTreeView::item:selected, QListView::item:selected {
+    background-color: #2A0808;
+    color: #E74C3C;
+}
+
+/* Separators */
+QFrame[frameShape="4"], QFrame[frameShape="5"] {
+    color: #2A2A2A;
+}
+
+/* Logo/banner area */
+#logoApp {
+    background-color: transparent;
+}
+
+/* Table views (partitions, etc.) */
+QTableView {
+    background-color: #111111;
+    color: #EEEEEE;
+    border: 1px solid #2A2A2A;
+    gridline-color: #1A1A1A;
+}
+
+QHeaderView::section {
+    background-color: #0D0D0D;
+    color: #888888;
+    border: none;
+    padding: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+QTableView::item:selected {
+    background-color: #2A0808;
+    color: #E74C3C;
+}

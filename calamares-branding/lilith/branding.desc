@@ -1,0 +1,39 @@
+---
+# Calamares branding configuration — Lilith Linux
+# Documentation: https://github.com/calamares/calamares/wiki/Branding-Dev
+
+componentName: lilith
+
+# URLs shown during install
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+
+# Images
+productLogo: "logo.png"
+productIcon: "logo.png"
+productWelcome: "banner.png"
+
+# Strings
+strings:
+    productName:         "@APPLICATION_NAME@"
+    shortProductName:    "Lilith"
+    version:             "1.0"
+    shortVersion:        "1.0"
+    versionedName:       "Lilith Linux 1.0 (Resolute)"
+    shortVersionedName:  "Lilith 1.0"
+    bootloaderEntryName: "Lilith Linux"
+    productUrl:          "https://github.com/BlancoBAM/Lilith-Linux"
+    supportUrl:          "https://github.com/BlancoBAM/Lilith-Linux/issues"
+    knownIssuesUrl:      "https://github.com/BlancoBAM/Lilith-Linux/issues"
+    releaseNotesUrl:     "https://github.com/BlancoBAM/Lilith-Linux/releases"
+    donateUrl:           ""
+
+# Installation slideshow
+slideshow: "show.qml"
+
+# Styling — dark flame palette
+style:
+    sidebarBackground:   "#0D0D0D"
+    sidebarText:         "#FFFFFF"
+    sidebarTextSelect:   "#E74C3C"
+    sidebarTextHighlight: "#C0392B"

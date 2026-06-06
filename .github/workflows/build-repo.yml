@@ -1,0 +1,172 @@
+name: Build & Deploy Lilith Package Repository
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lilith-debrep.toml'
+      - 'build_lilith_repo.py'
+      - '.github/workflows/build-repo.yml'
+  schedule:
+    # Weekly on Monday at 6:00 AM UTC — auto-check for new releases
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      fetch_versions:
+        description: 'Fetch latest versions from GitHub API'
+        required: false
+        default: 'true'
+        type: boolean
+      dry_run:
+        description: 'Dry run (build but do not deploy)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  build-and-deploy:
+    name: Build Lilith Apt Repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout lil-build
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            dpkg-dev \
+            gzip \
+            bzip2 \
+            xz-utils \
+            gnupg \
+            curl \
+            wget \
+            python3-pip \
+            rsync
+
+      - name: Install Python dependencies
+        run: |
+          pip install toml requests 2>/dev/null || true
+
+      - name: Configure git
+        run: |
+          git config --global user.email "blancobam@protonmail.com"
+          git config --global user.name "Lilith Linux CI"
+
+      # ── Step: Fetch latest versions from GitHub API ───────────────────────
+      - name: Fetch latest package versions
+        if: github.event_name == 'schedule' || inputs.fetch_versions == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== Fetching latest release versions ==="
+          # Use the fetch-versions.sh script
+          chmod +x fetch-versions.sh
+          bash fetch-versions.sh || echo "Version fetch had some failures (non-fatal)"
+
+      # ── Step: Commit version updates if changed ───────────────────────────
+      - name: Commit version updates
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add lilith-debrep.toml
+          if git diff --staged --quiet; then
+            echo "No version changes to commit"
+          else
+            echo "=== Version changes detected, committing ==="
+            git commit -m "chore(versions): auto-update package versions [skip ci]"
+            git push origin main
+          fi
+
+      # ── Step: Build the apt repository ───────────────────────────────────
+      - name: Build apt repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== Building Lilith apt repository ==="
+          python3 build_lilith_repo.py
+          echo "=== Repository structure ==="
+          find Lilith-Repo -type f | sort | head -50
+
+      # ── Step: Prepare Pages deployment ───────────────────────────────────
+      - name: Prepare GitHub Pages content
+        if: inputs.dry_run != 'true'
+        run: |
+          # Create a staging area for the pages site
+          mkdir -p pages-deploy
+
+          # Copy repo artifacts
+          cp -r Lilith-Repo/. pages-deploy/
+
+          # Copy keyring
+          cp -f lilith-archive-keyring.asc pages-deploy/public-key.asc 2>/dev/null || true
+          cp -f lilith-archive-keyring.gpg pages-deploy/lilith-archive-keyring.gpg 2>/dev/null || true
+
+          # Verify structure
+          echo "=== Pages deployment contents ==="
+          find pages-deploy -type f | sort
+
+      # ── Step: Deploy to lilith-packages repo ─────────────────────────────
+      - name: Deploy to BlancoBAM/lilith-packages
+        if: inputs.dry_run != 'true'
+        env:
+          DEPLOY_TOKEN: ${{ secrets.LILITH_PACKAGES_DEPLOY_TOKEN }}
+        run: |
+          # Clone the lilith-packages repo
+          git clone "https://x-access-token:${DEPLOY_TOKEN}@github.com/BlancoBAM/lilith-packages.git" deploy-repo
+
+          # Sync content (preserve .git)
+          rsync -av --delete \
+            --exclude='.git' \
+            pages-deploy/ deploy-repo/
+
+          # Push changes
+          cd deploy-repo
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to deploy to lilith-packages"
+          else
+            git commit -m "deploy: update package repository $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          Built from: ${{ github.repository }}@${{ github.sha }}
+          Trigger: ${{ github.event_name }}"
+            git push origin main
+            echo "✓ Deployed to https://blancobam.github.io/lilith-packages"
+          fi
+
+      # ── Step: Dry run summary ─────────────────────────────────────────────
+      - name: Dry run summary
+        if: inputs.dry_run == 'true'
+        run: |
+          echo "=== DRY RUN: Repository was built but NOT deployed ==="
+          echo "Files that would be deployed:"
+          find Lilith-Repo -type f | sort
+          echo ""
+          echo "APT source line:"
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/lilith-archive-keyring.gpg] https://blancobam.github.io/lilith-packages stable main xtra"
+
+      # ── Step: Summary ─────────────────────────────────────────────────────
+      - name: Build Summary
+        run: |
+          echo "=============================="
+          echo " Lilith Packages Build Done  "
+          echo "=============================="
+          echo "Repository URL: https://blancobam.github.io/lilith-packages"
+          echo "APT Source:"
+          echo "  deb [arch=amd64 signed-by=/usr/share/keyrings/lilith-archive-keyring.gpg] \\"
+          echo "    https://blancobam.github.io/lilith-packages stable main xtra"
+          echo ""
+          echo "Users can install the keyring with:"
+          echo "  curl -fsSL https://blancobam.github.io/lilith-packages/public-key.asc | \\"
+          echo "    sudo gpg --dearmor -o /usr/share/keyrings/lilith-archive-keyring.gpg"

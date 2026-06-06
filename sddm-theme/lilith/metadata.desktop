@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=Lilith
+Description=Lilith Linux — Dark Flame Login Theme
+Author=BlancoBAM
+Version=1.0.0
+License=GPLv2
+Website=https://github.com/BlancoBAM/Lilith-Linux
+Type=sddm-theme
+MainScript=Main.qml
+Background=background.jpg
