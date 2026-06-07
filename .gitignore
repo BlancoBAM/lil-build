@@ -7,9 +7,18 @@ staging/binaries/
 staging/build/
 *.log
 
-# Optional: You might want to ignore all debs/appimages if they are generated
-# staging/debs/
-# staging/appimages/
+# Lilith-Repo/ — built output, deployed to lilith-packages GitHub Pages
+# Uncomment to exclude from git (but keeping for local reference):
+# Lilith-Repo/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Temp/cache
+deb-cache/
+*.tmp
 
 # System files
 .DS_Store
