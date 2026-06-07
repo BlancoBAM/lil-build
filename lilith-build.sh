@@ -219,19 +219,24 @@ if $DO_DEPLOY_PAGES; then
     [[ -d "$REPO_DIR" ]] || err "Built repo not found at $REPO_DIR. Run --build-repo first."
 
     if $DRY_RUN; then
-        note "[DRY-RUN] Would sync $REPO_DIR → $PAGES_REPO_DIR and push"
+        note "[DRY-RUN] Would sync $REPO_DIR/dists + $REPO_DIR/pool → $PAGES_REPO_DIR and push"
     else
-        # Sync the built repo into the Pages repo
-        note "Syncing built repo to pages repo..."
+        # Sync only dists/ and pool/ — preserve static Pages files (index.html, README.md, etc.)
+        note "Syncing dists/ to pages repo..."
         rsync -av --delete \
             --exclude='.git' \
-            --exclude='*.log' \
-            --exclude='deb-cache' \
-            "$REPO_DIR/" "$PAGES_REPO_DIR/"
+            "$REPO_DIR/dists/" "$PAGES_REPO_DIR/dists/"
 
-        # Also copy the keyring and any static files
+        note "Syncing pool/ to pages repo..."
+        rsync -av --delete \
+            --exclude='.git' \
+            "$REPO_DIR/pool/" "$PAGES_REPO_DIR/pool/"
+
+        # Copy support files (manifests, keyrings)
         cp -f "$SCRIPT_DIR/lilith-archive-keyring.asc" "$PAGES_REPO_DIR/public-key.asc" 2>/dev/null || true
         cp -f "$SCRIPT_DIR/lilith-archive-keyring.gpg" "$PAGES_REPO_DIR/lilith-archive-keyring.gpg" 2>/dev/null || true
+        [[ -f "$REPO_DIR/lilith-distro-manifest.json" ]] && \
+            cp -f "$REPO_DIR/lilith-distro-manifest.json" "$PAGES_REPO_DIR/" || true
 
         # Commit and push
         cd "$PAGES_REPO_DIR"
