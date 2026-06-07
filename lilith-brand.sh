@@ -325,30 +325,30 @@ FONT_TMP="/tmp/lilith-fonts-extract"
 
 if ! $DRY_RUN; then
     mkdir -p "$FONTS_DEST"
-    rm -rf "$FONT_TMP" && mkdir -p "$FONT_TMP"
+    rm -rf "$FONT_TMP" || true
+    mkdir -p "$FONT_TMP"
 
     note "Extracting font collection..."
-    unzip -q "$FONT_ZIP" -d "$FONT_TMP"
+    unzip -q "$FONT_ZIP" -d "$FONT_TMP" || { warn "Font zip extraction failed: $FONT_ZIP"; }
 
     # Copy all font files (TTF/OTF) to the Lilith fonts directory
     find "$FONT_TMP" \( -name "*.ttf" -o -name "*.otf" -o -name "*.woff" -o -name "*.woff2" \) | while read -r font_file; do
-        # Flatten directory structure, use font filename directly
-        cp -f "$font_file" "$FONTS_DEST/" && note "  Font: $(basename $font_file)"
+        cp -f "$font_file" "$FONTS_DEST/" && note "  Font: $(basename "$font_file")" || true
     done
 
     # Also install NerdFonts symbols if present
     NERDFONT_ZIP="/home/aegon/Downloads/NerdFontsSymbolsOnly.zip"
     if [[ -f "$NERDFONT_ZIP" ]]; then
-        unzip -q "$NERDFONT_ZIP" -d "$FONT_TMP/nerd"
+        unzip -q "$NERDFONT_ZIP" -d "$FONT_TMP/nerd" || true
         find "$FONT_TMP/nerd" \( -name "*.ttf" -o -name "*.otf" \) -exec cp -f {} "$FONTS_DEST/" \;
         info "NerdFonts Symbols Only installed"
     fi
 
     # Update font cache inside chroot
     note "Running fc-cache inside chroot..."
-    chr fc-cache -f /usr/share/fonts/Lilith && info "Font cache updated"
+    chr fc-cache -f /usr/share/fonts/Lilith && info "Font cache updated" || warn "fc-cache skipped (may not be available in chroot yet)"
 
-    rm -rf "$FONT_TMP"
+    rm -rf "$FONT_TMP" || true
 else
     note "[DRY-RUN] Would extract $FONT_ZIP → $FONTS_DEST"
 fi
@@ -519,10 +519,10 @@ fi
 step "STEP 9 — Rebuilding initramfs"
 
 if ! $DRY_RUN; then
-    KERNEL_VER=$(ls "$CHROOT/boot/" | grep "vmlinuz-" | sed 's/vmlinuz-//' | sort -V | tail -1)
+    KERNEL_VER=$(ls "$CHROOT/boot/" 2>/dev/null | grep "vmlinuz-" | sed 's/vmlinuz-//' | sort -V | tail -1)
     if [[ -n "$KERNEL_VER" ]]; then
         note "Kernel version: $KERNEL_VER"
-        chr update-initramfs -u -k "$KERNEL_VER" && info "initramfs rebuilt" || warn "initramfs rebuild had warnings"
+        chr update-initramfs -u -k "$KERNEL_VER" && info "initramfs rebuilt" || warn "initramfs rebuild had warnings (non-fatal)"
     else
         warn "Could not detect kernel version, skipping initramfs rebuild"
     fi
