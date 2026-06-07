@@ -214,18 +214,19 @@ step "STEP 4 — COSMIC Desktop Defaults"
 
 COSMIC_CONF="$CHROOT/etc/cosmic"
 if ! $DRY_RUN; then
-    mkdir -p "$COSMIC_CONF"
+    mkdir -p "$COSMIC_CONF" || true
 fi
 
 # COSMIC theme config via ron files (System76 COSMIC uses RON format)
 # Set dark mode and flame accent color for all new users via /etc/skel
 SKEL_COSMIC="$CHROOT/etc/skel/.config/cosmic"
 if ! $DRY_RUN; then
-    mkdir -p "$SKEL_COSMIC/com.system76.CosmicTheme.Dark/v1"
-    mkdir -p "$SKEL_COSMIC/com.system76.CosmicBackground/v1"
-    mkdir -p "$SKEL_COSMIC/com.system76.CosmicTk/v1"
+    mkdir -p "$SKEL_COSMIC/com.system76.CosmicTheme.Dark/v1" || true
+    mkdir -p "$SKEL_COSMIC/com.system76.CosmicBackground/v1" || true
+    mkdir -p "$SKEL_COSMIC/com.system76.CosmicTk/v1" || true
 
     # Accent color: flame red (#E74C3C → RGB 231, 76, 60)
+    {
     cat > "$SKEL_COSMIC/com.system76.CosmicTheme.Dark/v1/accent" << 'RONEOF'
 (
     red: 0.906,
@@ -234,8 +235,10 @@ if ! $DRY_RUN; then
     alpha: 1.0,
 )
 RONEOF
+    } || warn "Could not write CosmicTheme accent"
 
     # Background wallpaper
+    {
     cat > "$SKEL_COSMIC/com.system76.CosmicBackground/v1/entry" << 'RONEOF'
 (
     wallpaper_path: "/usr/share/backgrounds/lilith/default.png",
@@ -244,26 +247,31 @@ RONEOF
     output: "all",
 )
 RONEOF
+    } || warn "Could not write CosmicBackground entry"
 
     # Force dark mode
+    {
     cat > "$SKEL_COSMIC/com.system76.CosmicTk/v1/is_dark" << 'RONEOF'
 (true)
 RONEOF
+    } || warn "Could not write CosmicTk is_dark"
 
     info "COSMIC dark mode + flame accent configured via /etc/skel"
 fi
 
-# Also set Fluent-dark icon theme in XSETTINGS / dconf
+# Also set Fluent-dark icon theme via dconf profile
 SKEL_DCONF="$CHROOT/etc/skel/.config"
 if ! $DRY_RUN; then
-    mkdir -p "$SKEL_DCONF"
-    # Write a dconf user file for GTK integration
-    mkdir -p "$SKEL_DCONF/dconf"
+    mkdir -p "$SKEL_DCONF/dconf" || true
+    # Ensure dconf profile dir exists before writing
+    mkdir -p "$CHROOT/etc/dconf/profile" || true
+    {
     cat > "/tmp/lilith-dconf-profile" << 'EOF'
 user-db:user
 system-db:local
 EOF
-    cp "/tmp/lilith-dconf-profile" "$CHROOT/etc/dconf/profile/user" 2>/dev/null || true
+    cp "/tmp/lilith-dconf-profile" "$CHROOT/etc/dconf/profile/user" 2>/dev/null
+    } || warn "dconf profile write skipped (dir may not exist in chroot yet)"
 fi
 
 # =============================================================================
