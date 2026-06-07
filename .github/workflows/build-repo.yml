@@ -103,33 +103,41 @@ jobs:
       - name: Prepare GitHub Pages content
         if: inputs.dry_run != 'true'
         run: |
-          # Create a staging area for the pages site
-          mkdir -p pages-deploy
-
-          # Copy repo artifacts
-          cp -r Lilith-Repo/. pages-deploy/
-
-          # Copy keyring
-          cp -f lilith-archive-keyring.asc pages-deploy/public-key.asc 2>/dev/null || true
-          cp -f lilith-archive-keyring.gpg pages-deploy/lilith-archive-keyring.gpg 2>/dev/null || true
+          # Copy keyring into Lilith-Repo for easy reference
+          cp -f lilith-archive-keyring.asc Lilith-Repo/public-key.asc 2>/dev/null || true
+          cp -f lilith-archive-keyring.gpg Lilith-Repo/lilith-archive-keyring.gpg 2>/dev/null || true
 
           # Verify structure
-          echo "=== Pages deployment contents ==="
-          find pages-deploy -type f | sort
+          echo "=== Repository artifacts ==="
+          find Lilith-Repo/dists -type f | sort
+          echo "Pool debs: $(find Lilith-Repo/pool -name '*.deb' | wc -l)"
 
       # ── Step: Deploy to lilith-packages repo ─────────────────────────────
       - name: Deploy to BlancoBAM/lilith-packages
         if: inputs.dry_run != 'true'
         env:
+          # LILITH_PACKAGES_DEPLOY_TOKEN: a PAT with repo scope for BlancoBAM/lilith-packages
+          # Set this in: lil-build repo → Settings → Secrets → Actions → New secret
+          # Name: LILITH_PACKAGES_DEPLOY_TOKEN
+          # Value: GitHub Personal Access Token (classic) with 'repo' scope
           DEPLOY_TOKEN: ${{ secrets.LILITH_PACKAGES_DEPLOY_TOKEN }}
         run: |
           # Clone the lilith-packages repo
           git clone "https://x-access-token:${DEPLOY_TOKEN}@github.com/BlancoBAM/lilith-packages.git" deploy-repo
 
-          # Sync content (preserve .git)
+          # Sync only dists/ and pool/ — preserve static Pages files (index.html, README.md)
           rsync -av --delete \
             --exclude='.git' \
-            pages-deploy/ deploy-repo/
+            Lilith-Repo/dists/ deploy-repo/dists/
+
+          rsync -av --delete \
+            --exclude='.git' \
+            Lilith-Repo/pool/ deploy-repo/pool/
+
+          # Copy support files
+          cp -f lilith-archive-keyring.asc deploy-repo/public-key.asc 2>/dev/null || true
+          cp -f lilith-archive-keyring.gpg deploy-repo/lilith-archive-keyring.gpg 2>/dev/null || true
+          cp -f Lilith-Repo/lilith-distro-manifest.json deploy-repo/ 2>/dev/null || true
 
           # Push changes
           cd deploy-repo
