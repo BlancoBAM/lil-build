@@ -1,12 +1,12 @@
 {
     "distro_name": "Lilith Linux",
     "base_ubuntu_codename": "resolute",
-    "repo_url": "https://packages.lilithlinux.org",
-    "generated": "2026-05-22T03:24:48.710016Z",
+    "repo_url": "https://blancobam.github.io/lilith-packages",
+    "generated": "2026-06-08T22:10:04.579292Z",
     "custom_repository_overlay": {
         "name": "Lilith Custom Repo",
-        "url": "https://packages.lilithlinux.org/",
-        "apt_source": "deb [arch=amd64 trusted=yes] https://packages.lilithlinux.org stable main xtra",
+        "url": "https://blancobam.github.io/lilith-packages/",
+        "apt_source": "deb [arch=amd64 trusted=yes] https://blancobam.github.io/lilith-packages stable main xtra desktop",
         "components": {
             "core": [
                 "offerings",
@@ -18,6 +18,8 @@
                 "lsd",
                 "zoxide",
                 "bat",
+                "shapeshifter",
+                "lilith-grub-theme",
                 "s8n-system",
                 "hellfire",
                 "browseros",
@@ -55,7 +57,24 @@
                 "proton-pass",
                 "nixite",
                 "linuxtoys",
-                "keygeist"
+                "keygeist",
+                "cosmic-connect"
+            ],
+            "desktop": [
+                "lilith-plasma",
+                "lilith-xfce",
+                "lilith-lxde",
+                "lilith-lxqt",
+                "lilith-budgie",
+                "lilith-deepin",
+                "lilith-trinity",
+                "lilith-enlightenment",
+                "lilith-pantheon",
+                "lilith-gnome",
+                "lilith-mate",
+                "lilith-i3",
+                "lilith-sway",
+                "lilith-welcome"
             ]
         }
     },

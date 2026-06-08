@@ -25,6 +25,7 @@ local|cosmic-uniform-glass-theme-installer|main|Cosmic Uniform Glass Theme insta
 # === LILITH RECOMMENDED EXTRA COMPONENTS (Xtra Component - Curated Optional) ===
 local|ferdium|xtra|Ferdium Desktop multi-service visual app
 local|nixite|xtra|Nixite Text Editor
+local|cosmic-connect|xtra|COSMIC Connect KDE Connect integration applet
 local|linuxtoys|xtra|Collection of toys for terminal
 local|homepage|xtra|Homepage browser start page dashboard
 local|bashsenpai|xtra|BashSenpai Terminal AI assistant

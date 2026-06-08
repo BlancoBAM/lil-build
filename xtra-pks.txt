@@ -29,3 +29,4 @@ https://snapcraft.io/journal
 https://flathub.org/en/apps/org.kde.digikam
 https://flathub.org/en/apps/io.github.sitraorg.sitra
 https://proton.me/pass/download/linux
+https://github.com/BlancoBAM/cosmic-connect

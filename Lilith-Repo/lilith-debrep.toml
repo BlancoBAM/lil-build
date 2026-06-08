@@ -10,14 +10,14 @@
 name = "Lilith Linux"
 description = "Lilith Linux Overlay Package Repository — thin wrapper over Ubuntu Resolute"
 architectures = ["amd64"]
-signing_key = "packages@lilithlinux.org"
-url = "https://packages.lilithlinux.org"
+signing_key = "blancobam@protonmail.com"
+url = "https://blancobam.github.io/lilith-packages"
 
 [distribution]
 name = "stable"
 codename = "stable"
 version = "1.0.0"
-components = ["main", "xtra"]
+components = ["main", "xtra", "desktop"]
 
 # =============================================================================
 # UPSTREAM SOURCES
@@ -50,7 +50,10 @@ priority = 95
 [lilith_packages.main.offerings]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.0.2-beta-1_amd64.deb"
-version = "1.0.2-beta-1"
+version = "1.2.0"
+auto_update = true
+github_repo = "BlancoBAM/Offerings"
+deb_pattern = "offerings_*_amd64.deb"
 description = "Unified package manager GUI for Lilith Linux"
 depends = ["libfontconfig1", "libxcb1", "libxkbcommon0", "libssl3"]
 install_also = "curl -fsSL https://raw.githubusercontent.com/BlancoBAM/Offerings/main/install.sh | bash"
@@ -58,21 +61,30 @@ install_also = "curl -fsSL https://raw.githubusercontent.com/BlancoBAM/Offerings
 [lilith_packages.main.tweakers]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb"
-version = "1.0.1"
+version = "1.0.2"
+auto_update = true
+github_repo = "BlancoBAM/Tweakers"
+deb_pattern = "tweakers-*-amd64.deb"
 description = "System optimization and tweaks GUI"
 depends = ["libfontconfig1", "libxcb1", "libgtk-3-0"]
 
 [lilith_packages.main.lilim]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb"
-version = "0.1.0"
+version = "build-31"
+auto_update = true
+github_repo = "BlancoBAM/Lilim"
+deb_pattern = "lilim_*_amd64.deb"
 description = "AI Assistant with persistent memory (Lilith AI)"
 depends = ["python3", "python3-pip", "nodejs", "npm"]
 
 [lilith_packages.main.stake]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb"
-version = "0.2.3"
+version = "0.2.4"
+auto_update = true
+github_repo = "BlancoBAM/Stake"
+deb_pattern = "stake-*-amd64.deb"
 description = "Lilith Stake CLI package manager tool"
 depends = ["libssl3"]
 
@@ -80,6 +92,9 @@ depends = ["libssl3"]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb"
 version = "1.1.0"
+auto_update = true
+github_repo = "BlancoBAM/Ouija-Pad"
+deb_pattern = "ouija-pad_*_amd64.deb"
 description = "Lilith default text editor GUI"
 depends = ["libwebkit2gtk-4.1-0"]
 
@@ -87,24 +102,36 @@ depends = ["libwebkit2gtk-4.1-0"]
 source = "redirect"
 upstream = "https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd_1.2.0_amd64.deb"
 version = "1.2.0"
+auto_update = true
+github_repo = "lsd-rs/lsd"
+deb_pattern = "lsd_*_amd64.deb"
 description = "Modern ls replacement with icons and colors"
 
 [lilith_packages.main.zoxide]
 source = "redirect"
 upstream = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb"
 version = "0.9.9"
+auto_update = true
+github_repo = "ajeetdsouza/zoxide"
+deb_pattern = "zoxide_*_amd64.deb"
 description = "Smart cd — learns your most frequent directories"
 
 [lilith_packages.main.bat]
 source = "redirect"
 upstream = "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat_0.26.1_amd64.deb"
 version = "0.26.1"
+auto_update = true
+github_repo = "sharkdp/bat"
+deb_pattern = "bat_*_amd64.deb"
 description = "cat replacement with syntax highlighting and git integration"
 
 [lilith_packages.main.topgrade]
 source = "redirect"
 upstream = "https://github.com/topgrade-rs/topgrade/releases/download/v17.5.0/topgrade_17.5.0_amd64.deb"
-version = "17.5.0"
+version = "17.5.1"
+auto_update = true
+github_repo = "topgrade-rs/topgrade"
+deb_pattern = "topgrade_*_amd64.deb"
 description = "Upgrade everything — apt, cargo, npm, flatpak, etc."
 
 # ── WRAPPER PACKAGES (binary/AppImage/installer downloads) ───────────────────
@@ -182,7 +209,7 @@ apt_alternative = "nushell"
 source = "wrapper"
 upstream = "https://github.com/sharkdp/fd"
 resolved_url = "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-musl.tar.gz"
-version = "10.2.0"
+version = "10.4.2"
 description = "fd — fast and user-friendly find alternative"
 install_method = "tarball-binary"
 binary_name = "fd"
@@ -213,7 +240,7 @@ upstream = "https://github.com/dalance/procs"
 source = "wrapper"
 upstream = "https://github.com/ismaelgv/rnr"
 resolved_url = "https://github.com/ismaelgv/rnr/releases/latest"
-version = "0.4.1"
+version = "0.5.1"
 description = "rnr — batch rename tool written in Rust"
 install_method = "tarball-binary"
 binary_name = "rnr"
@@ -234,7 +261,7 @@ note = "No prebuilt binary available — install via cargo at first boot or post
 source = "wrapper"
 upstream = "https://github.com/orhun/systeroid"
 resolved_url = "https://github.com/orhun/systeroid/releases/latest"
-version = "0.4.5"
+version = "0.4.6"
 description = "systeroid — interactive sysctl TUI manager"
 install_method = "tarball-binary"
 binary_name = "systeroid"
@@ -291,7 +318,7 @@ upstream = "https://github.com/casey/just"
 source = "wrapper"
 upstream = "https://github.com/tarka/xcp"
 resolved_url = "https://github.com/tarka/xcp/releases/download/xcp-v0.24.8/xcp-v0.24.8-x86_64-unknown-linux-gnu.tar.gz"
-version = "0.24.8"
+version = "xcp-v0.24.8"
 description = "xcp — extended cp with progress bars and parallel copy"
 install_method = "tarball-binary"
 binary_name = "xcp"
@@ -320,7 +347,7 @@ flatpak_alternative = "com.github.ilai_deutel.kibi"
 source = "wrapper"
 upstream = "https://github.com/qarmin/czkawka"
 resolved_url = "https://github.com/qarmin/czkawka/releases/latest"
-version = "8.0.0"
+version = "11.0.1"
 description = "czkawka — fast duplicate file finder with GUI and CLI"
 install_method = "binary"
 binary_name = "czkawka"
@@ -385,7 +412,7 @@ source = "wrapper"
 upstream = "https://github.com/astral-sh/uv"
 resolved_url = "https://github.com/astral-sh/uv/releases/latest"
 installer = "curl -LsSf https://astral.sh/uv/install.sh | sh"
-version = "0.7.8"
+version = "0.11.19"
 description = "uv — extremely fast Python package manager by Astral"
 install_method = "tarball-binary"
 binary_name = "uv"
@@ -405,7 +432,7 @@ install_dest = "/usr/bin/pacstall"
 source = "wrapper"
 upstream = "https://github.com/google-gemini/gemini-cli"
 npm_package = "@google/gemini-cli"
-version = "0.43.0"
+version = "0.45.2"
 description = "Google Gemini CLI — AI assistant in the terminal"
 install_method = "npm-global"
 binary_name = "gemini"
@@ -516,6 +543,89 @@ version = "0.1.0"
 description = "COSMIC Wizard — first-run setup wizard"
 install_method = "cosmic-ppa-or-cargo"
 
+[lilith_packages.main.lilith-grub-theme]
+source = "local"
+version = "1.0.0"
+description = "Custom grub2 bootloader theme for Lilith Linux (bundled offline)"
+
+[lilith_packages.desktop.lilith-plasma]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal KDE Plasma Desktop Environment for Lilith Linux"
+depends = ["plasma-desktop", "sddm", "systemsettings", "plasma-workspace-wayland"]
+
+[lilith_packages.desktop.lilith-xfce]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal XFCE Desktop Environment for Lilith Linux"
+depends = ["xfce4", "xfce4-session", "xfwm4", "xfce4-panel"]
+
+[lilith_packages.desktop.lilith-lxde]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal LXDE Desktop Environment for Lilith Linux"
+depends = ["lxde-core", "lxsession", "openbox"]
+
+[lilith_packages.desktop.lilith-lxqt]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal LXQt Desktop Environment for Lilith Linux"
+depends = ["lxqt-core", "openbox"]
+
+[lilith_packages.desktop.lilith-budgie]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal Budgie Desktop Environment for Lilith Linux"
+depends = ["budgie-desktop", "budgie-indicator-applet"]
+
+[lilith_packages.desktop.lilith-deepin]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal Deepin Desktop Environment for Lilith Linux"
+depends = ["dde-session-ui", "dde-desktop", "deepin-wm"]
+
+[lilith_packages.desktop.lilith-trinity]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal Trinity Desktop Environment for Lilith Linux"
+depends = ["tde-trinity", "tdm"]
+
+[lilith_packages.desktop.lilith-enlightenment]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal Enlightenment Desktop Environment for Lilith Linux"
+depends = ["enlightenment", "terminology"]
+
+[lilith_packages.desktop.lilith-pantheon]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal Pantheon Desktop Environment for Lilith Linux"
+depends = ["pantheon-shell", "gala", "wingpanel", "plank"]
+
+[lilith_packages.desktop.lilith-gnome]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal GNOME Desktop Environment for Lilith Linux"
+depends = ["gnome-session", "gnome-shell", "gnome-control-center"]
+
+[lilith_packages.desktop.lilith-mate]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal MATE Desktop Environment for Lilith Linux"
+depends = ["mate-desktop-environment-core"]
+
+[lilith_packages.desktop.lilith-i3]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal i3 Window Manager for Lilith Linux"
+depends = ["i3-wm", "i3status", "i3lock", "dmenu"]
+
+[lilith_packages.desktop.lilith-sway]
+source = "wrapper"
+version = "1.0.0"
+description = "Minimal Sway Window Manager for Lilith Linux"
+depends = ["sway", "swaylock", "swayidle", "swaybg", "wmenu"]
+
 # =============================================================================
 # EXTRA PACKAGES — Xtra Component
 # Curated optional/recommended packages (from xtra-pks.txt)
@@ -537,6 +647,14 @@ upstream = "https://github.com/aspizu/nixite"
 version = "0.1.0"
 description = "Nixite text editor"
 install_method = "cargo-install"
+
+[lilith_packages.xtra.cosmic-connect]
+source = "wrapper"
+upstream = "https://github.com/BlancoBAM/cosmic-connect"
+version = "1.0.0"
+description = "COSMIC Connect — KDE Connect integration applet for COSMIC Desktop"
+install_method = "just-install"
+depends = ["git", "curl", "cargo", "rustc", "libdbus-1-dev", "libsecret-1-dev", "pkg-config"]
 
 [lilith_packages.xtra.linuxtoys]
 source = "wrapper"
@@ -582,7 +700,7 @@ install_method = "cargo-install"
 source = "wrapper"
 upstream = "https://github.com/wavetermdev/waveterm"
 resolved_url = "https://github.com/wavetermdev/waveterm/releases/latest"
-version = "0.10.4"
+version = "0.14.5"
 description = "WaveTerm — open-source AI-native terminal with visual blocks"
 install_method = "appimage-or-deb"
 note = "Check GitHub releases for latest .deb or AppImage"
@@ -683,7 +801,7 @@ description = "digiKam — professional photo asset management"
 source = "wrapper"
 upstream = "https://github.com/spacedriveapp/spacedrive"
 resolved_url = "https://github.com/spacedriveapp/spacedrive/releases/latest"
-version = "0.4.2"
+version = "0.4.3"
 description = "Spacedrive — open-source cross-platform file explorer"
 install_method = "binary-or-appimage"
 

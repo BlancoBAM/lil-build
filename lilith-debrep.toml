@@ -648,6 +648,14 @@ version = "0.1.0"
 description = "Nixite text editor"
 install_method = "cargo-install"
 
+[lilith_packages.xtra.cosmic-connect]
+source = "wrapper"
+upstream = "https://github.com/BlancoBAM/cosmic-connect"
+version = "1.0.0"
+description = "COSMIC Connect — KDE Connect integration applet for COSMIC Desktop"
+install_method = "just-install"
+depends = ["git", "curl", "cargo", "rustc", "libdbus-1-dev", "libsecret-1-dev", "pkg-config"]
+
 [lilith_packages.xtra.linuxtoys]
 source = "wrapper"
 upstream = "https://github.com/psygreg/linuxtoys"

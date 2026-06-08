@@ -1262,19 +1262,36 @@ fi
         ("nixite", "0.1.0", "Nixite — minimalist text editor", "https://github.com/aspizu/nixite"),
         ("linuxtoys", "1.0.0", "LinuxToys — collection of interactive terminal toys", "https://github.com/psygreg/linuxtoys"),
         ("keygeist", "0.1.0", "Keygeist — SSH agent UI manager", "https://github.com/mudler/Keygeist"),
+        ("cosmic-connect", "1.0.0", "COSMIC Connect — KDE Connect integration applet for COSMIC Desktop", "https://github.com/BlancoBAM/cosmic-connect"),
     ]
     for name, version, desc, url in xtra_git:
+        if name == "cosmic-connect":
+            depends = "git, curl, cargo, rustc, libdbus-1-dev, libsecret-1-dev, pkg-config"
+        else:
+            depends = "git, curl"
+
         script = f"""
 echo "[{name}] Cloning and installing {name}..."
 cd /tmp
 rm -rf {name}
 git clone --depth=1 {url}.git {name} 2>/dev/null || git clone --depth=1 {url} {name}
 cd {name}
-if [[ -f install.sh ]]; then bash install.sh; elif command -v cargo &>/dev/null; then cargo install --path . 2>&1 | tail -3; fi
+if [[ -f install.sh ]]; then
+    bash install.sh
+elif command -v just &>/dev/null && [[ -f justfile || -f Justfile ]]; then
+    just install
+elif [[ -f justfile || -f Justfile ]]; then
+    echo "[{name}] just not found. Installing just via cargo..."
+    cargo install just 2>&1 | tail -3
+    export PATH="$HOME/.cargo/bin:$PATH"
+    just install
+elif command -v cargo &>/dev/null; then
+    cargo install --path . 2>&1 | tail -3
+fi
 echo "[{name}] Done."
 """
         packages_by_comp["xtra"].append(
-            build_wrapper_deb(name, version, desc, script, component="xtra", depends="git, curl")
+            build_wrapper_deb(name, version, desc, script, component="xtra", depends=depends)
         )
 
     # ────────────────────────────────────────────────────────────────────────

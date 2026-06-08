@@ -399,6 +399,7 @@ install_deb_from_staging "tweakers"   "Tweakers"
 install_deb_from_staging "stake"      "Stake"
 install_deb_from_staging "ouija-pad"  "Ouija-Pad"
 install_deb_from_staging "lilim"      "Lilim"
+install_deb_from_staging "lilith-grub-theme" "Lilith Grub Theme"
 
 # Enable Lilith-AI systemd service inside chroot
 if [[ -f "$CHROOT/lib/systemd/system/lilith-ai.service" || -f "$CHROOT/etc/systemd/system/lilith-ai.service" ]]; then
@@ -458,6 +459,163 @@ for app in tweakers stake ouija-pad lilim; do
     fi
 done
 info "BlancoBAM tools installed"
+
+# ═════════════════════════════════════════════════════════════════════════════
+# STEP 7.5 — lilith-welcome (Live Session Welcome App)
+# ═════════════════════════════════════════════════════════════════════════════
+# lilith-welcome is a Slint+Rust welcome/installer launcher app.
+# It ONLY appears in the live session (guarded by lilith-live-check.sh).
+# Calamares removes the autostart entry from bare-metal installs.
+# Source: https://github.com/BlancoBAM/lilith-welcome
+# Inspiration: parchlinux/parch-welcome
+# ═════════════════════════════════════════════════════════════════════════════
+step "STEP 7.5 — Installing lilith-welcome (Live Session Welcome App)"
+
+LILITH_WELCOME_SRC="/home/aegon/lilith-welcome"
+LILITH_WELCOME_BINARY="$BINARIES/lilith-welcome"
+LILITH_WELCOME_ASSETS="$LILITH_WELCOME_SRC/ui/pages/assets"
+
+# ── Install binary ─────────────────────────────────────────────────────────
+if [[ -f "$LILITH_WELCOME_BINARY" ]]; then
+    install -Dm755 "$LILITH_WELCOME_BINARY" "$CHROOT/usr/bin/lilith-welcome"
+    info "lilith-welcome binary → /usr/bin/lilith-welcome"
+elif [[ -f "$LILITH_WELCOME_SRC/target/release/lilith-welcome" ]]; then
+    # Fallback: use locally-built binary if not yet staged
+    install -Dm755 "$LILITH_WELCOME_SRC/target/release/lilith-welcome" \
+        "$CHROOT/usr/bin/lilith-welcome"
+    warn "lilith-welcome: used local build (not in staging — run pre-build-host.sh)"
+else
+    warn "lilith-welcome binary not found in staging or local build — skipping"
+    warn "  To build: cd $LILITH_WELCOME_SRC && cargo build --release"
+fi
+
+# ── Install Slint UI assets ────────────────────────────────────────────────
+if [[ -d "$LILITH_WELCOME_ASSETS" ]]; then
+    mkdir -p "$CHROOT/usr/share/lilith-welcome/assets"
+    cp -r "$LILITH_WELCOME_ASSETS/"* "$CHROOT/usr/share/lilith-welcome/assets/"
+    chmod -R 644 "$CHROOT/usr/share/lilith-welcome/assets/"
+    find "$CHROOT/usr/share/lilith-welcome" -type d -exec chmod 755 {} \;
+    info "lilith-welcome assets → /usr/share/lilith-welcome/assets/"
+else
+    warn "lilith-welcome UI assets not found at $LILITH_WELCOME_ASSETS"
+fi
+
+# ── Install icon ───────────────────────────────────────────────────────────
+if [[ -f "$LILITH_WELCOME_SRC/resources/logo.png" ]]; then
+    mkdir -p "$CHROOT/usr/share/icons/hicolor/256x256/apps"
+    install -Dm644 "$LILITH_WELCOME_SRC/resources/logo.png" \
+        "$CHROOT/usr/share/pixmaps/lilith-welcome.png"
+    install -Dm644 "$LILITH_WELCOME_SRC/resources/logo.png" \
+        "$CHROOT/usr/share/icons/hicolor/256x256/apps/lilith-welcome.png"
+    info "lilith-welcome icon → /usr/share/pixmaps/lilith-welcome.png"
+fi
+
+# ── Install app launcher .desktop ──────────────────────────────────────────
+cat > "$CHROOT/usr/share/applications/lilith-welcome.desktop" << 'EOF'
+[Desktop Entry]
+Name=Lilith Welcome
+GenericName=Welcome Screen
+Comment=Lilith Linux live welcome and installer launcher
+Exec=/usr/bin/lilith-welcome
+Icon=lilith-welcome
+Terminal=false
+Type=Application
+Categories=System;
+Keywords=welcome;lilith;linux;install;calamares;
+StartupNotify=true
+EOF
+chmod 644 "$CHROOT/usr/share/applications/lilith-welcome.desktop"
+info "lilith-welcome .desktop → /usr/share/applications/lilith-welcome.desktop"
+
+# ── Install live-session guard script ─────────────────────────────────────
+if [[ -f "$LILITH_WELCOME_SRC/resources/lilith-live-check.sh" ]]; then
+    install -Dm755 "$LILITH_WELCOME_SRC/resources/lilith-live-check.sh" \
+        "$CHROOT/usr/sbin/lilith-live-check.sh"
+    info "lilith-live-check.sh → /usr/sbin/lilith-live-check.sh"
+else
+    # Write it inline as fallback
+    cat > "$CHROOT/usr/sbin/lilith-live-check.sh" << 'GUARDEOF'
+#!/usr/bin/env bash
+# Live-session detection guard for lilith-welcome autostart.
+# Launches lilith-welcome only in Casper/live-boot sessions.
+IS_LIVE=false
+grep -qE "boot=(casper|live)" /proc/cmdline 2>/dev/null && IS_LIVE=true
+[[ -f /usr/share/initramfs-tools/hooks/casper ]] && IS_LIVE=true
+[[ -f /usr/share/initramfs-tools/hooks/live ]] && IS_LIVE=true
+dpkg -s casper &>/dev/null 2>&1 && IS_LIVE=true
+dpkg -s live-boot &>/dev/null 2>&1 && IS_LIVE=true
+[[ -d /cdrom ]] || [[ -d /cow ]] || [[ -d /lib/live ]] && IS_LIVE=true
+CURRENT_USER=$(id -un 2>/dev/null || echo "")
+[[ "$CURRENT_USER" =~ ^(ubuntu|user|casper)$ ]] && IS_LIVE=true
+if [[ "$IS_LIVE" == "true" ]]; then
+    sleep 3
+    exec /usr/bin/lilith-welcome
+fi
+exit 0
+GUARDEOF
+    chmod 755 "$CHROOT/usr/sbin/lilith-live-check.sh"
+    info "lilith-live-check.sh written inline → /usr/sbin/lilith-live-check.sh"
+fi
+
+# ── Install XDG autostart entry (live-session only) ────────────────────────
+mkdir -p "$CHROOT/etc/xdg/autostart"
+cat > "$CHROOT/etc/xdg/autostart/lilith-welcome-live.desktop" << 'EOF'
+[Desktop Entry]
+Name=Lilith Welcome
+Comment=Lilith Linux welcome screen (live session only)
+Exec=/usr/sbin/lilith-live-check.sh
+Terminal=false
+Type=Application
+Icon=lilith-welcome
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=3
+NotShowIn=KDE;
+EOF
+chmod 644 "$CHROOT/etc/xdg/autostart/lilith-welcome-live.desktop"
+info "Autostart → /etc/xdg/autostart/lilith-welcome-live.desktop"
+note "  (Guarded: only launches in Casper live sessions)"
+
+# ── Install Calamares post-install cleanup module ─────────────────────────
+# This module removes the live-session autostart entry from the INSTALLED system
+# so lilith-welcome never autostarts after a bare-metal install.
+mkdir -p "$CHROOT/etc/calamares/modules"
+
+if [[ -f "$LILITH_WELCOME_SRC/resources/calamares/lilith-welcome-cleanup.conf" ]]; then
+    install -Dm644 \
+        "$LILITH_WELCOME_SRC/resources/calamares/lilith-welcome-cleanup.conf" \
+        "$CHROOT/etc/calamares/modules/lilith-welcome-cleanup.conf"
+    install -Dm755 \
+        "$LILITH_WELCOME_SRC/resources/calamares/lilith-welcome-cleanup.sh" \
+        "$CHROOT/etc/calamares/modules/lilith-welcome-cleanup.sh"
+else
+    # Write cleanup conf inline as fallback
+    cat > "$CHROOT/etc/calamares/modules/lilith-welcome-cleanup.conf" << 'CALEOF'
+---
+# Removes lilith-welcome live-session autostart from installed system
+dontChroot: false
+script:
+    - "-": "rm -f /etc/xdg/autostart/lilith-welcome-live.desktop"
+    - "-": "rm -f /usr/sbin/lilith-live-check.sh"
+    - "-": "update-desktop-database /usr/share/applications/ 2>/dev/null || true"
+CALEOF
+fi
+
+# Wire the cleanup module into Calamares settings.conf if it exists
+CALAMARES_SETTINGS="$CHROOT/etc/calamares/settings.conf"
+if [[ -f "$CALAMARES_SETTINGS" ]]; then
+    if ! grep -q "lilith-welcome-cleanup" "$CALAMARES_SETTINGS"; then
+        sed -i '/- finished/i\    - shellprocess@lilith-welcome-cleanup' \
+            "$CALAMARES_SETTINGS" 2>/dev/null || true
+        note "Wired lilith-welcome-cleanup into Calamares exec sequence"
+    else
+        note "lilith-welcome-cleanup already in Calamares settings.conf"
+    fi
+else
+    warn "Calamares settings.conf not found — cleanup module installed but not wired"
+    warn "Manually add 'shellprocess@lilith-welcome-cleanup' to exec sequence"
+fi
+
+info "lilith-welcome fully installed (live-session autostart + Calamares cleanup)"
 
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 8 — Shapeshifter (Rust source binary)
@@ -701,10 +859,17 @@ _alias_if_exists du   dust
 _alias_if_exists ps   procs
 _alias_if_exists top  btm  # bottom
 
-# zoxide cd
-command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)" || true
+# zoxide cd — only in interactive shells (not during boot/session startup)
+if [[ $- == *i* ]]; then
+    command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash 2>/dev/null)" 2>/dev/null || true
+fi
 
 export PATH="/usr/local/bin:/opt/lilith-apps:$PATH"
+
+# atuin shell history — only in interactive shells, fully suppress all errors
+if [[ $- == *i* ]]; then
+    command -v atuin >/dev/null 2>&1 && eval "$(atuin init bash 2>/dev/null)" 2>/dev/null || true
+fi
 PROFILEEOF
 chmod 644 "$CHROOT/etc/profile.d/lilith-rust-alternatives.sh"
 info "Rust alternatives profile.d written"
@@ -872,20 +1037,78 @@ DISTRIB_DESCRIPTION="Lilith Linux 1.0 (Resolute)"
 EOF
 
 echo "lilith" > "$CHROOT/etc/hostname"
-info "Lilith Linux branding applied (os-release, lsb-release, hostname)"
 
-# Update plymouth / boot splash branding if available
-if [[ -f "$ASSETS/official-logo.png" ]]; then
-    # Copy logo to known plymouth locations
+# /etc/hosts — must include 127.0.1.1 lilith or make-ssl-cert will stall at boot
+cat > "$CHROOT/etc/hosts" << 'EOF'
+127.0.0.1   localhost
+127.0.1.1   lilith
+::1         localhost ip6-localhost ip6-loopback
+fe00::0     ip6-localnet
+ff00::0     ip6-mcastprefix
+ff02::1     ip6-allnodes
+ff02::2     ip6-allrouters
+EOF
+
+info "Lilith Linux branding applied (os-release, lsb-release, hostname, hosts)"
+
+# ── Comprehensive Ubuntu → Lilith branding replacement ────────────────────────
+LILITH_BANNER="$CHROOT/usr/share/lilith/branding/lilith-banner.png"
+OFFICIAL_LOGO="$ASSETS/official-logo.png"
+
+# Ensure branding dir exists and banner is in it
+mkdir -p "$CHROOT/usr/share/lilith/branding"
+if [[ -f "$ASSETS/lilith-banner.png" ]]; then
+    cp -v "$ASSETS/lilith-banner.png" "$CHROOT/usr/share/lilith/branding/lilith-banner.png"
+    LILITH_BANNER="$CHROOT/usr/share/lilith/branding/lilith-banner.png"
+elif [[ ! -f "$LILITH_BANNER" ]]; then
+    warn "lilith-banner.png not found in $ASSETS or branding dir — skipping banner replacements"
+    LILITH_BANNER=""
+fi
+
+# 1. Plymouth themes — replace any ubuntu logo/wordmark PNGs with official-logo.png
+if [[ -f "$OFFICIAL_LOGO" ]]; then
     for splash_dir in \
         "$CHROOT/usr/share/plymouth/themes/spinner" \
         "$CHROOT/usr/share/plymouth/themes/bgrt" \
+        "$CHROOT/usr/share/plymouth/themes/ubuntu-text" \
         "$CHROOT/usr/share/plymouth"; do
         if [[ -d "$splash_dir" ]]; then
-            cp -v "$ASSETS/official-logo.png" "$splash_dir/logo.png" 2>/dev/null || true
+            cp -v "$OFFICIAL_LOGO" "$splash_dir/logo.png" 2>/dev/null || true
         fi
     done
+    info "Official logo → Plymouth theme logo.png files"
 fi
+
+# 2. GNOME Help — replace ubuntu-logo.png in every locale with lilith-banner
+if [[ -n "${LILITH_BANNER:-}" ]] && [[ -f "$LILITH_BANNER" ]]; then
+    find "$CHROOT/usr/share/help" -name "ubuntu-logo.png" \
+        -exec cp -v "$LILITH_BANNER" {} \; 2>/dev/null || true
+    info "lilith-banner.png → GNOME Help ubuntu-logo.png (all locales)"
+fi
+
+# 3. Ubuntu icon theme — replace any ubuntu_logo or ubuntu-logo icon PNGs
+if [[ -f "$OFFICIAL_LOGO" ]]; then
+    find "$CHROOT/usr/share/icons" \
+        \( -name "*ubuntu_logo*" -o -name "*ubuntu-logo*" -o -name "ubuntu-logo.png" \) \
+        -name "*.png" -exec cp -v "$OFFICIAL_LOGO" {} \; 2>/dev/null || true
+    info "Official logo → ubuntu icon replacements"
+fi
+
+# 4. COSMIC / GNOME splash (ubuntu-logo.png in gnome-shell theme)
+if [[ -n "${LILITH_BANNER:-}" ]] && [[ -f "$LILITH_BANNER" ]]; then
+    find "$CHROOT/usr/share/gnome-shell" -name "ubuntu-logo.png" \
+        -exec cp -v "$LILITH_BANNER" {} \; 2>/dev/null || true
+    find "$CHROOT/usr/share/gnome-shell" -name "*ubuntu*wordmark*" \
+        -name "*.png" -exec cp -v "$LILITH_BANNER" {} \; 2>/dev/null || true
+fi
+
+# 5. Ubiquity / installer ubuntu logo
+if [[ -n "${LILITH_BANNER:-}" ]] && [[ -f "$LILITH_BANNER" ]]; then
+    find "$CHROOT/usr/share/ubiquity" -name "*ubuntu*" -name "*.png" \
+        -exec cp -v "$LILITH_BANNER" {} \; 2>/dev/null || true
+fi
+
+info "Ubuntu → Lilith branding replacement complete"
 
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 17 — MIME database and XDG defaults
@@ -1048,6 +1271,12 @@ check_item "Shapeshifter .desktop"              "usr/share/applications/shapeshi
 check_item "Lilith-TTS .desktop"                "usr/share/applications/lilith-tts.desktop"
 check_item "Vicinae .desktop"                   "usr/share/applications/vicinae.desktop"
 check_item "BrowserOS .desktop"                 "usr/share/applications/browseros.desktop"
+check_item "lilith-welcome binary"              "usr/bin/lilith-welcome"
+check_item "lilith-welcome assets"              "usr/share/lilith-welcome/assets"
+check_item "lilith-welcome .desktop"            "usr/share/applications/lilith-welcome.desktop"
+check_item "lilith-welcome autostart (live)"    "etc/xdg/autostart/lilith-welcome-live.desktop"
+check_item "lilith-live-check.sh"               "usr/sbin/lilith-live-check.sh"
+check_item "Calamares cleanup module"           "etc/calamares/modules/lilith-welcome-cleanup.conf"
 check_item "COSMIC skel config"                 "etc/skel/.config/cosmic/theme.toml"
 check_item "Rust alternatives profile"          "etc/profile.d/lilith-rust-alternatives.sh"
 check_item "OS branding (os-release)"           "etc/os-release"
