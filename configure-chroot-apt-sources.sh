@@ -49,7 +49,7 @@ cat > "$SOURCES_DIR/lilith-linux.sources" << EOF
 Types: deb
 URIs: ${REPO_URL}
 Suites: stable
-Components: main xtra
+Components: core xtra
 Architectures: amd64
 Signed-By: /usr/share/keyrings/lilith-archive-keyring.gpg
 EOF
@@ -76,7 +76,7 @@ else
 Types: deb
 URIs: ${REPO_URL}
 Suites: stable
-Components: main xtra
+Components: core xtra
 Architectures: amd64
 Trusted: yes
 EOF
@@ -91,7 +91,7 @@ cat > "$SOURCES_DIR/lilith-local.list" << EOF
 # Lilith Linux LOCAL Repository (for Cubic/chroot builds)
 # Points to the locally built repo on the host system.
 # This entry is automatically disabled on the installed system.
-deb [arch=amd64 trusted=yes] file://${REPO_ABS_PATH} stable main xtra
+deb [arch=amd64 trusted=yes] file://${REPO_ABS_PATH} stable core xtra
 EOF
 info "Local file:// source written for Cubic builds"
 
@@ -191,7 +191,7 @@ done
 [[ -f "$CHROOT/etc/apt/apt.conf.d/99-lilith-silence-cdrom" ]] && echo "    ✔ /etc/apt/apt.conf.d/99-lilith-silence-cdrom"
 echo ""
 echo "  APT source lines:"
-echo "    deb [arch=amd64 trusted=yes] ${REPO_URL} stable main xtra"
-echo "    deb [arch=amd64 trusted=yes] file://${REPO_ABS_PATH} stable main xtra"
+echo "    deb [arch=amd64 trusted=yes] ${REPO_URL} stable core xtra"
+echo "    deb [arch=amd64 trusted=yes] file://${REPO_ABS_PATH} stable core xtra"
 echo ""
 info "Chroot APT sources configured for Lilith Linux repository."

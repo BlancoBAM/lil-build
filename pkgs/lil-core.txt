@@ -58,7 +58,7 @@ https://github.com/pop-os/cosmic-applets
 https://github.com/lucas-dclrcq/awesome-pop-launcher
 https://github.com/cosmic-utils/wizard
 https://github.com/cosmic-utils/clipboard-manager
-https://github.com/cosmic-utils/cosmic-connect-applet
+https://github.com/BlancoBAM/cosmic-connect
 https://github.com/cosmic-utils/accounts
 https://github.com/cosmic-utils/cosmic-project-collection
 https://github.com/uutils/util-linux

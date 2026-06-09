@@ -9,9 +9,9 @@
 #   python3 /home/aegon/lil-build/build_lilith_repo.py
 #
 # Output: /home/aegon/lil-build/Lilith-Repo/
-#   pool/main/*.deb
+#   pool/core/*.deb
 #   pool/xtra/*.deb
-#   dists/stable/{main,xtra}/binary-amd64/Packages{,.gz}
+#   dists/stable/{core,xtra}/binary-amd64/Packages{,.gz}
 #   dists/stable/Release
 #   lilith-distro-manifest.json
 # =============================================================================
@@ -68,7 +68,7 @@ def download_file(url, dest, label=""):
         return False
 
 def init_dirs():
-    for comp in ["main", "xtra", "desktop"]:
+    for comp in ["core", "xtra", "desktop"]:
         os.makedirs(os.path.join(REPO_ROOT, "dists/stable", comp, "binary-amd64"), exist_ok=True)
         os.makedirs(os.path.join(REPO_ROOT, "pool", comp), exist_ok=True)
     print("[+] Repository directory structure ready")
@@ -122,7 +122,7 @@ def get_deb_metadata(url, pkg_name):
 
 # ── Wrapper deb builder ────────────────────────────────────────────────────────
 def build_wrapper_deb(pkg_name, version, desc, postinst_script,
-                      component="main", depends=None, preinst=None):
+                      component="core", depends=None, preinst=None):
     """Build a minimal wrapper .deb with a postinst that downloads/installs the tool."""
     build_dir = f"/tmp/lilith-wrapper-{pkg_name}"
     shutil.rmtree(build_dir, ignore_errors=True)
@@ -222,7 +222,7 @@ def build_repo_indexes(packages_by_comp):
         f"Codename: stable\n"
         f"Date: {now}\n"
         f"Architectures: amd64\n"
-        f"Components: main xtra desktop\n"
+        f"Components: core xtra desktop\n"
         f"Description: Thin package overlay for Lilith Linux (Ubuntu Resolute base)\n"
         f"SHA256:\n"
     ) + "\n".join(sha256_lines) + "\n"
@@ -282,7 +282,7 @@ exit 0
         f.write(postinst_script)
     os.chmod(os.path.join(build_dir, "DEBIAN/postinst"), 0o755)
     
-    output_pool = os.path.join(REPO_ROOT, "pool/main")
+    output_pool = os.path.join(REPO_ROOT, "pool/core")
     os.makedirs(output_pool, exist_ok=True)
     deb_out_path = os.path.join(output_pool, f"{pkg_name}_{version}_amd64.deb")
     
@@ -292,7 +292,7 @@ exit 0
     
     size = os.path.getsize(deb_out_path)
     sha256 = get_sha256(deb_out_path)
-    rel_filename = f"pool/main/{pkg_name}_{version}_amd64.deb"
+    rel_filename = f"pool/core/{pkg_name}_{version}_amd64.deb"
     
     return {
         "Package": pkg_name, "Version": version,
@@ -306,7 +306,7 @@ exit 0
 # =============================================================================
 def main():
     init_dirs()
-    packages_by_comp = {"main": [], "xtra": [], "desktop": []}
+    packages_by_comp = {"core": [], "xtra": [], "desktop": []}
 
     # ────────────────────────────────────────────────────────────────────────
     # MAIN COMPONENT — DEB REDIRECTS
@@ -327,10 +327,10 @@ def main():
     for name, url in deb_redirects:
         meta = get_deb_metadata(url, name)
         if meta:
-            packages_by_comp["main"].append(meta)
+            packages_by_comp["core"].append(meta)
 
     # Custom Grub theme package
-    packages_by_comp["main"].append(build_grub_theme_deb())
+    packages_by_comp["core"].append(build_grub_theme_deb())
 
     # ────────────────────────────────────────────────────────────────────────
     # MAIN COMPONENT — WRAPPER DEBS
@@ -338,7 +338,7 @@ def main():
     print("\n── Wrapper DEBs ──")
 
     # s8n — CLI system manager
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "s8n-system", "0.1.3",
         "Lilith System Package Manager CLI (s8n)",
         """
@@ -352,7 +352,7 @@ s8n --version 2>/dev/null && echo "[s8n-system] s8n installed OK" || true
     ))
 
     # HellFire Browser — download tar.xz, install to /opt/hellfire
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "hellfire", "152.0a1",
         "HellFire Browser — privacy-focused custom Firefox for Lilith Linux",
         r"""
@@ -427,7 +427,7 @@ echo "[hellfire] HellFire Browser installation complete."
     ))
 
     # BrowserOS AppImage
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "browseros", "0.42.0.1",
         "Lilith Default Web Browser OS AppImage",
         """
@@ -454,7 +454,7 @@ echo "[browseros] BrowserOS installed."
     ))
 
     # Hyper Terminal AppImage
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "hyper-terminal", "3.4.1",
         "Hyper terminal emulator for Lilith Linux",
         """
@@ -481,7 +481,7 @@ echo "[hyper-terminal] Hyper terminal installed."
     ))
 
     # Vicinae AppImage
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "vicinae", "0.21.0",
         "Vicinae Visual Workspace AppImage",
         """
@@ -508,7 +508,7 @@ echo "[vicinae] Vicinae installed."
     ))
 
     # Lilith-TTS
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "lilith-tts", "1.0.0",
         "Lilith Linux Text-to-Speech Engine",
         """
@@ -534,7 +534,7 @@ fi
     ))
 
     # nushell
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "nushell", "0.103.0",
         "Nu shell — structured data shell written in Rust",
         """
@@ -564,7 +564,7 @@ fi
     ))
 
     # fd (find replacement)
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "fd-lilith", "10.2.0",
         "fd — fast and user-friendly find alternative (Lilith binary edition)",
         """
@@ -591,7 +591,7 @@ fi
     ))
 
     # rnr (batch rename)
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "rnr", "0.4.1",
         "rnr — batch rename files using regex patterns",
         """
@@ -618,7 +618,7 @@ fi
     ))
 
     # systeroid
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "systeroid", "0.4.5",
         "systeroid — interactive sysctl TUI manager",
         """
@@ -645,7 +645,7 @@ fi
     ))
 
     # navi
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "navi", "2.24.0",
         "navi — interactive cheatsheet tool for the command line",
         """
@@ -672,7 +672,7 @@ fi
     ))
 
     # xcp
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "xcp", "0.24.8",
         "xcp — extended cp with progress bars and parallel copy",
         """
@@ -690,7 +690,7 @@ echo "[xcp] xcp installed."
     ))
 
     # kibi
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "kibi", "0.9.5",
         "kibi — tiny configurable text editor in < 1024 lines of Rust",
         """
@@ -717,7 +717,7 @@ fi
     ))
 
     # czkawka
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "czkawka", "8.0.0",
         "czkawka — fast duplicate file finder with CLI and GUI",
         """
@@ -741,7 +741,7 @@ fi
     ))
 
     # uv (Astral UV)
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "astral-uv", "0.7.8",
         "uv — extremely fast Python package and project manager by Astral",
         """
@@ -770,7 +770,7 @@ fi
     ))
 
     # gemini-cli
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "gemini-cli", "0.43.0",
         "Google Gemini CLI — AI assistant in the terminal",
         """
@@ -785,7 +785,7 @@ which gemini && echo "[gemini-cli] gemini installed: $(gemini --version 2>/dev/n
     ))
 
     # pacstall
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "pacstall-wrapper", "6.2.1",
         "pacstall — AUR-inspired package manager for Ubuntu/Debian",
         """
@@ -802,7 +802,7 @@ command -v pacstall && echo "[pacstall] installed OK" || echo "[pacstall] instal
     ))
 
     # soar
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "soar", "1.0.0",
         "soar — fast distro-agnostic SAB package manager",
         """
@@ -818,7 +818,7 @@ fi
     ))
 
     # simplemoji
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "simplemoji", "1.2.4",
         "Simplemoji — emoji picker for COSMIC/GTK environments",
         """
@@ -842,7 +842,7 @@ fi
     ))
 
     # Fluent icon theme
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "fluent-icon-theme-installer", "2024.11.19",
         "Fluent icon theme — modern flat icon theme for Linux desktops",
         """
@@ -858,7 +858,7 @@ echo "[fluent-icon-theme] Fluent icons installed."
     ))
 
     # pling-store
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "pling-store-wrapper", "5.0.2",
         "Pling Store — desktop app discovery and installation client",
         """
@@ -885,7 +885,7 @@ echo "[pling-store] Pling Store installed."
     ))
 
     # script-kit
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "script-kit-wrapper", "3.45.1",
         "Script Kit — automate anything with JavaScript scripts",
         """
@@ -924,7 +924,7 @@ echo "[script-kit] Script Kit installed."
     ))
 
     # cosmic-uniform-glass-theme
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "cosmic-uniform-glass-theme-installer", "1.0.0",
         "COSMIC Uniform Glass — frosted glass theme for COSMIC Desktop",
         """
@@ -940,7 +940,7 @@ echo "[cosmic-glass] Theme installed to /usr/share/cosmic/themes/"
     ))
 
     # uutils coreutils wrapper
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "uutils-coreutils-wrapper", "0.0.30",
         "uutils coreutils — Rust reimplementation of GNU coreutils (wrapper)",
         """
@@ -966,7 +966,7 @@ echo "[uutils] Wrapper installed at $WRAPPER"
     ))
 
     # Noto Color Emoji
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "noto-color-emoji", "2.047",
         "Noto Color Emoji font from Google Fonts",
         """
@@ -977,7 +977,7 @@ echo "[noto-emoji] Done."
     ))
 
     # flatpak + flathub
-    packages_by_comp["main"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "flatpak-flathub", "1.15.10",
         "Flatpak with Flathub remote configured",
         """
@@ -1018,7 +1018,7 @@ fi
         ))
 
     # ── lilith-welcome — live session welcome app ──────────────────────────────
-    packages_by_comp["desktop"].append(build_wrapper_deb(
+    packages_by_comp["core"].append(build_wrapper_deb(
         "lilith-welcome", "1.0.0",
         "Lilith Linux live-session welcome screen and Calamares installer launcher",
         r"""
@@ -1128,7 +1128,7 @@ CALCONF
 update-desktop-database /usr/share/applications/ 2>/dev/null || true
 echo "[lilith-welcome] Installation complete."
 """,
-        component="desktop",
+        component="core",
         depends="curl, python3",
     ))
 
@@ -1311,9 +1311,9 @@ echo "[{name}] Done."
         "custom_repository_overlay": {
             "name": "Lilith Custom Repo",
             "url": f"{REPO_URL}/",
-            "apt_source": f"deb [arch=amd64 trusted=yes] {REPO_URL} stable main xtra desktop",
+            "apt_source": f"deb [arch=amd64 trusted=yes] {REPO_URL} stable core xtra desktop",
             "components": {
-                "core": [p["Package"] for p in packages_by_comp["main"]],
+                "core": [p["Package"] for p in packages_by_comp["core"]],
                 "xtra": [p["Package"] for p in packages_by_comp["xtra"]],
                 "desktop": [p["Package"] for p in packages_by_comp["desktop"]]
             }
@@ -1355,7 +1355,7 @@ echo "[{name}] Done."
         print("[+] Synced configure-lilith-os.sh → Lilith-Repo/")
 
     print("\n=== Lilith Repository build complete! ===")
-    print(f"  Main packages: {len(packages_by_comp['main'])}")
+    print(f"  Main packages: {len(packages_by_comp['core'])}")
     print(f"  Xtra packages: {len(packages_by_comp['xtra'])}")
     print(f"  Desktop packages: {len(packages_by_comp['desktop'])}")
     print(f"  Output: {REPO_ROOT}")

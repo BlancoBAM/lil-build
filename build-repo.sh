@@ -11,7 +11,7 @@
 # Commands:
 #   init              Initialize repository directory structure
 #   build             Build Packages/Release indexes from pool/
-#   add <file> [comp] Add a .deb to pool (comp: main|xtra|desktop, default: main)
+#   add <file> [comp] Add a .deb to pool (comp: core|xtra|desktop, default: core)
 #   apt-source        Print the APT source line for this repo
 #   all               Full rebuild: init → build
 #
@@ -28,7 +28,7 @@ REPO_ROOT="$SCRIPT_DIR/Lilith-Repo"
 DIST_NAME="stable"
 ARCH="amd64"
 REPO_URL="https://blancobam.github.io/lilith-packages"
-COMPONENTS="main xtra desktop"
+COMPONENTS="core xtra desktop"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 BLUE='\033[0;34m'; NC='\033[0m'
@@ -151,7 +151,7 @@ EOF
 # ---------------------------------------------------------------------------
 add_package() {
     local deb_file="${1:-}"
-    local comp="${2:-main}"
+    local comp="${2:-core}"
     [[ -f "$deb_file" ]] || err "Package not found: $deb_file"
     [[ " $COMPONENTS " =~ " $comp " ]] || err "Unknown component: $comp (must be one of: $COMPONENTS)"
     local pool_dir="$REPO_ROOT/pool/$comp"
@@ -167,7 +167,7 @@ apt_source() {
     echo ""
     echo "Add to /etc/apt/sources.list.d/lilith-linux.list:"
     echo ""
-    echo "  deb [arch=$ARCH signed-by=/usr/share/keyrings/lilith-archive-keyring.gpg] $REPO_URL $DIST_NAME main xtra"
+    echo "  deb [arch=$ARCH signed-by=/usr/share/keyrings/lilith-archive-keyring.gpg] $REPO_URL $DIST_NAME core xtra"
     echo ""
     echo "Install signing key:"
     echo "  curl -fsSL $REPO_URL/public-key.asc | sudo gpg --dearmor -o /usr/share/keyrings/lilith-archive-keyring.gpg"
@@ -186,7 +186,7 @@ Usage: $0 <command> [options]
 Commands:
   init              Initialize Lilith-Repo directory structure
   build             Build Packages/Release indexes from pool/
-  add <file> [comp] Add a .deb package (comp: main|xtra|desktop)
+  add <file> [comp] Add a .deb package (comp: core|xtra|desktop)
   apt-source        Print APT source configuration
   all               init + build (full rebuild)
 
@@ -207,7 +207,7 @@ EOF
 case "${1:-}" in
     init)        init_repo ;;
     build)       build_packages ;;
-    add)         add_package "${2:-}" "${3:-main}" ;;
+    add)         add_package "${2:-}" "${3:-core}" ;;
     apt-source)  apt_source ;;
     all)
         init_repo

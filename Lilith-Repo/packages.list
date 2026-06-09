@@ -2,25 +2,25 @@
 # For use with build_lilith_repo.py
 # Format: source|package|component|description
 
-# === LILITH CORE COMPONENTS (Main Component - Installed by Default) ===
-local|offerings|main|Unified package manager GUI
-local|tweakers|main|System optimization and tweaks
-local|lilim|main|AI Assistant with persistent memory
-local|s8n-system|main|Lilith System Package Manager CLI wrapper
-local|lilith-tts|main|Text-to-Speech Engine
-local|stake|main|Lilith Stake CLI tool
-local|ouija-pad|main|Simple text editor
-local|browseros|main|Lilith Default Web Browser OS AppImage
-local|hyper-terminal|main|Hyper terminal emulator for Lilith Linux
-local|hellfire|main|HellFire Distro Tool
-local|vicinae|main|Vicinae Visual Workspace AppImage
-local|soar|main|Soar Package Manager wrapper
-local|astral-uv|main|Astral uv python package manager wrapper
-local|pacstall-wrapper|main|Pacstall Package Manager wrapper
-local|fluent-icon-theme-installer|main|Fluent icon theme installer wrapper
-local|pling-store-wrapper|main|Pling-Store Client wrapper
-local|script-kit-wrapper|main|Script-Kit Desktop Application wrapper
-local|cosmic-uniform-glass-theme-installer|main|Cosmic Uniform Glass Theme installer
+# === LILITH CORE COMPONENTS (Core Component - Installed by Default) ===
+local|offerings|core|Unified package manager GUI
+local|tweakers|core|System optimization and tweaks
+local|lilim|core|AI Assistant with persistent memory
+local|s8n-system|core|Lilith System Package Manager CLI wrapper
+local|lilith-tts|core|Text-to-Speech Engine
+local|stake|core|Lilith Stake CLI tool
+local|ouija-pad|core|Simple text editor
+local|browseros|core|Lilith Default Web Browser OS AppImage
+local|hyper-terminal|core|Hyper terminal emulator for Lilith Linux
+local|hellfire|core|HellFire Distro Tool
+local|vicinae|core|Vicinae Visual Workspace AppImage
+local|soar|core|Soar Package Manager wrapper
+local|astral-uv|core|Astral uv python package manager wrapper
+local|pacstall-wrapper|core|Pacstall Package Manager wrapper
+local|fluent-icon-theme-installer|core|Fluent icon theme installer wrapper
+local|pling-store-wrapper|core|Pling-Store Client wrapper
+local|script-kit-wrapper|core|Script-Kit Desktop Application wrapper
+local|cosmic-uniform-glass-theme-installer|core|Cosmic Uniform Glass Theme installer
 
 # === LILITH RECOMMENDED EXTRA COMPONENTS (Xtra Component - Curated Optional) ===
 local|ferdium|xtra|Ferdium Desktop multi-service visual app
@@ -48,20 +48,20 @@ local|digikam|xtra|Digikam photography asset management software
 local|spacedrive|xtra|Spacedrive cross-platform file explorer
 
 # === SYSTEM DEPENDENCIES ===
-apt|build-essential|main|Build tools
-apt|cargo|main|Rust package manager
-apt|rustc|main|Rust compiler
-apt|libssl-dev|main|SSL development files
-apt|pkg-config|main|Package configuration tool
-apt|libwayland-dev|main|Wayland development files
-apt|libseat-dev|main|Seat management library
-apt|libxkbcommon-dev|main|XKB common library
-apt|libinput-dev|main|Input device library
-apt|libgtk-3-dev|main|GTK3 development files
-apt|libfontconfig1-dev|main|Font configuration development
-apt|libxcb1-dev|main|XCB development files
-apt|cmake|main|CMake build system
-apt|nodejs|main|JavaScript runtime
-apt|flatpak|main|Flatpak application sandbox support
-apt|gnome-software-plugin-flatpak|main|Software center flatpak plugin
-apt|libfuse2t64|main|FUSE 2 filesystem support library
+apt|build-essential|core|Build tools
+apt|cargo|core|Rust package manager
+apt|rustc|core|Rust compiler
+apt|libssl-dev|core|SSL development files
+apt|pkg-config|core|Package configuration tool
+apt|libwayland-dev|core|Wayland development files
+apt|libseat-dev|core|Seat management library
+apt|libxkbcommon-dev|core|XKB common library
+apt|libinput-dev|core|Input device library
+apt|libgtk-3-dev|core|GTK3 development files
+apt|libfontconfig1-dev|core|Font configuration development
+apt|libxcb1-dev|core|XCB development files
+apt|cmake|core|CMake build system
+apt|nodejs|core|JavaScript runtime
+apt|flatpak|core|Flatpak application sandbox support
+apt|gnome-software-plugin-flatpak|core|Software center flatpak plugin
+apt|libfuse2t64|core|FUSE 2 filesystem support library

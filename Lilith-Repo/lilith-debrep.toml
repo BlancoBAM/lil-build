@@ -47,7 +47,7 @@ priority = 95
 
 # ── DEB REDIRECTS (direct .deb downloads from GitHub Releases) ───────────────
 
-[lilith_packages.main.offerings]
+[lilith_packages.core.offerings]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.0.2-beta-1_amd64.deb"
 version = "1.2.0"
@@ -58,7 +58,7 @@ description = "Unified package manager GUI for Lilith Linux"
 depends = ["libfontconfig1", "libxcb1", "libxkbcommon0", "libssl3"]
 install_also = "curl -fsSL https://raw.githubusercontent.com/BlancoBAM/Offerings/main/install.sh | bash"
 
-[lilith_packages.main.tweakers]
+[lilith_packages.core.tweakers]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb"
 version = "1.0.2"
@@ -68,7 +68,7 @@ deb_pattern = "tweakers-*-amd64.deb"
 description = "System optimization and tweaks GUI"
 depends = ["libfontconfig1", "libxcb1", "libgtk-3-0"]
 
-[lilith_packages.main.lilim]
+[lilith_packages.core.lilim]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb"
 version = "build-31"
@@ -78,7 +78,7 @@ deb_pattern = "lilim_*_amd64.deb"
 description = "AI Assistant with persistent memory (Lilith AI)"
 depends = ["python3", "python3-pip", "nodejs", "npm"]
 
-[lilith_packages.main.stake]
+[lilith_packages.core.stake]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb"
 version = "0.2.4"
@@ -88,7 +88,7 @@ deb_pattern = "stake-*-amd64.deb"
 description = "Lilith Stake CLI package manager tool"
 depends = ["libssl3"]
 
-[lilith_packages.main.ouija-pad]
+[lilith_packages.core.ouija-pad]
 source = "redirect"
 upstream = "https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb"
 version = "1.1.0"
@@ -98,7 +98,7 @@ deb_pattern = "ouija-pad_*_amd64.deb"
 description = "Lilith default text editor GUI"
 depends = ["libwebkit2gtk-4.1-0"]
 
-[lilith_packages.main.lsd]
+[lilith_packages.core.lsd]
 source = "redirect"
 upstream = "https://github.com/lsd-rs/lsd/releases/download/v1.2.0/lsd_1.2.0_amd64.deb"
 version = "1.2.0"
@@ -107,7 +107,7 @@ github_repo = "lsd-rs/lsd"
 deb_pattern = "lsd_*_amd64.deb"
 description = "Modern ls replacement with icons and colors"
 
-[lilith_packages.main.zoxide]
+[lilith_packages.core.zoxide]
 source = "redirect"
 upstream = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide_0.9.9-1_amd64.deb"
 version = "0.9.9"
@@ -116,7 +116,7 @@ github_repo = "ajeetdsouza/zoxide"
 deb_pattern = "zoxide_*_amd64.deb"
 description = "Smart cd — learns your most frequent directories"
 
-[lilith_packages.main.bat]
+[lilith_packages.core.bat]
 source = "redirect"
 upstream = "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat_0.26.1_amd64.deb"
 version = "0.26.1"
@@ -125,7 +125,7 @@ github_repo = "sharkdp/bat"
 deb_pattern = "bat_*_amd64.deb"
 description = "cat replacement with syntax highlighting and git integration"
 
-[lilith_packages.main.topgrade]
+[lilith_packages.core.topgrade]
 source = "redirect"
 upstream = "https://github.com/topgrade-rs/topgrade/releases/download/v17.5.0/topgrade_17.5.0_amd64.deb"
 version = "17.5.1"
@@ -136,7 +136,7 @@ description = "Upgrade everything — apt, cargo, npm, flatpak, etc."
 
 # ── WRAPPER PACKAGES (binary/AppImage/installer downloads) ───────────────────
 
-[lilith_packages.main.s8n-system]
+[lilith_packages.core.s8n-system]
 source = "wrapper"
 upstream = "https://github.com/BlancoBAM/S8n-System/releases/download/v0.1.3/s8n-linux-amd64"
 version = "0.1.3"
@@ -144,7 +144,7 @@ description = "Lilith System Package Manager CLI wrapper (s8n)"
 install_method = "binary"
 install_dest = "/usr/local/bin/s8n"
 
-[lilith_packages.main.hellfire]
+[lilith_packages.core.hellfire]
 source = "wrapper"
 upstream = "https://github.com/CYFARE/HellFire/releases/download/v152.0a1_FP2/hellfire-152.0a1.en-US.linux-x86_64.tar.xz"
 installer = "https://github.com/CYFARE/HellFire/releases/download/v152.0a1_FP2/linux_installer.py"
@@ -157,7 +157,7 @@ symlink = "/usr/local/bin/hellfire"
 desktop = true
 homepage = "https://github.com/CYFARE/HellFire"
 
-[lilith_packages.main.browseros]
+[lilith_packages.core.browseros]
 source = "wrapper"
 upstream = "https://github.com/BlancoBAM/Lilith-Linux/raw/main/BrowserOS_v0.42.0.1_x64.AppImage"
 version = "0.42.0.1"
@@ -166,7 +166,7 @@ install_method = "appimage"
 install_dest = "/opt/browseros"
 depends = ["libfuse2t64"]
 
-[lilith_packages.main.hyper-terminal]
+[lilith_packages.core.hyper-terminal]
 source = "wrapper"
 upstream = "https://github.com/BlancoBAM/Lilith-Linux/raw/main/Hyper-3.4.1.AppImage"
 version = "3.4.1"
@@ -176,7 +176,7 @@ install_dest = "/opt/hyper"
 config_files = ["~/hyper_setup_backup.js", "~/hyper_backup/"]
 depends = ["libfuse2t64"]
 
-[lilith_packages.main.vicinae]
+[lilith_packages.core.vicinae]
 source = "wrapper"
 upstream = "https://github.com/vicinaehq/vicinae/releases/download/v0.21.0/Vicinae-x86_64.AppImage"
 version = "0.21.0"
@@ -185,7 +185,7 @@ install_method = "appimage"
 install_dest = "/opt/vicinae"
 depends = ["libfuse2t64"]
 
-[lilith_packages.main.lilith-tts]
+[lilith_packages.core.lilith-tts]
 source = "wrapper"
 upstream = "https://github.com/BlancoBAM/Lilith-TTS"
 version = "1.0.0"
@@ -194,7 +194,7 @@ install_method = "cargo-build"
 binary_name = "lilith-tts-daemon"
 install_dest = "/usr/local/bin/lilith-tts"
 
-[lilith_packages.main.nushell]
+[lilith_packages.core.nushell]
 source = "wrapper"
 upstream = "https://github.com/nushell/nushell/releases/latest"
 resolved_url = "https://github.com/nushell/nushell/releases/download/0.103.0/nu-0.103.0-x86_64-unknown-linux-musl.tar.gz"
@@ -205,7 +205,7 @@ binary_name = "nu"
 install_dest = "/usr/local/bin/nu"
 apt_alternative = "nushell"
 
-[lilith_packages.main.fd]
+[lilith_packages.core.fd]
 source = "wrapper"
 upstream = "https://github.com/sharkdp/fd"
 resolved_url = "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-musl.tar.gz"
@@ -216,7 +216,7 @@ binary_name = "fd"
 install_dest = "/usr/local/bin/fd"
 note = "Direct binary extraction to avoid conflict with fd-find package required by pop-launcher"
 
-[lilith_packages.main.skim]
+[lilith_packages.core.skim]
 source = "wrapper"
 upstream = "https://github.com/skim-rs/skim"
 resolved_url = "https://github.com/skim-rs/skim/releases/latest"
@@ -229,14 +229,14 @@ fallback = "fzf"
 note = "No prebuilt x86_64 Linux binary; sk wrapper backed by fzf installed instead"
 apt_alternative = "fzf"
 
-[lilith_packages.main.procs]
+[lilith_packages.core.procs]
 source = "apt"
 apt_package = "procs"
 version = "0.14.10"
 description = "procs — modern ps replacement written in Rust"
 upstream = "https://github.com/dalance/procs"
 
-[lilith_packages.main.rnr]
+[lilith_packages.core.rnr]
 source = "wrapper"
 upstream = "https://github.com/ismaelgv/rnr"
 resolved_url = "https://github.com/ismaelgv/rnr/releases/latest"
@@ -246,7 +246,7 @@ install_method = "tarball-binary"
 binary_name = "rnr"
 install_dest = "/usr/local/bin/rnr"
 
-[lilith_packages.main.rip]
+[lilith_packages.core.rip]
 source = "wrapper"
 upstream = "https://github.com/nivekuil/rip"
 resolved_url = "https://github.com/nivekuil/rip/releases/latest"
@@ -257,7 +257,7 @@ binary_name = "rip"
 install_dest = "/usr/local/bin/rip"
 note = "No prebuilt binary available — install via cargo at first boot or post-install"
 
-[lilith_packages.main.systeroid]
+[lilith_packages.core.systeroid]
 source = "wrapper"
 upstream = "https://github.com/orhun/systeroid"
 resolved_url = "https://github.com/orhun/systeroid/releases/latest"
@@ -267,7 +267,7 @@ install_method = "tarball-binary"
 binary_name = "systeroid"
 install_dest = "/usr/local/bin/systeroid"
 
-[lilith_packages.main.navi]
+[lilith_packages.core.navi]
 source = "wrapper"
 upstream = "https://github.com/denisidoro/navi"
 resolved_url = "https://github.com/denisidoro/navi/releases/latest"
@@ -277,7 +277,7 @@ install_method = "tarball-binary"
 binary_name = "navi"
 install_dest = "/usr/local/bin/navi"
 
-[lilith_packages.main.tealdeer]
+[lilith_packages.core.tealdeer]
 source = "apt"
 apt_package = "tealdeer"
 version = "1.8.1"
@@ -285,7 +285,7 @@ description = "tealdeer (tldr) — fast tldr client in Rust"
 upstream = "https://github.com/dbrgn/tealdeer"
 binary = "tldr"
 
-[lilith_packages.main.starship]
+[lilith_packages.core.starship]
 source = "apt"
 apt_package = "starship"
 version = "1.22.1"
@@ -293,28 +293,28 @@ description = "Starship — cross-shell customizable prompt"
 upstream = "https://github.com/starship/starship"
 config = "/etc/skel/.config/starship.toml"
 
-[lilith_packages.main.ripgrep]
+[lilith_packages.core.ripgrep]
 source = "apt"
 apt_package = "ripgrep"
 version = "14.1.1"
 description = "ripgrep (rg) — fast line-oriented search tool"
 upstream = "https://github.com/BurntSushi/ripgrep"
 
-[lilith_packages.main.ripgrep-all]
+[lilith_packages.core.ripgrep-all]
 source = "apt"
 apt_package = "ripgrep-all"
 version = "0.10.10"
 description = "rga — ripgrep over PDFs, Office docs, compressed files"
 upstream = "https://github.com/phiresky/ripgrep-all"
 
-[lilith_packages.main.just]
+[lilith_packages.core.just]
 source = "apt"
 apt_package = "just"
 version = "1.45.0"
 description = "just — command runner / Makefile alternative"
 upstream = "https://github.com/casey/just"
 
-[lilith_packages.main.xcp]
+[lilith_packages.core.xcp]
 source = "wrapper"
 upstream = "https://github.com/tarka/xcp"
 resolved_url = "https://github.com/tarka/xcp/releases/download/xcp-v0.24.8/xcp-v0.24.8-x86_64-unknown-linux-gnu.tar.gz"
@@ -324,7 +324,7 @@ install_method = "tarball-binary"
 binary_name = "xcp"
 install_dest = "/usr/local/bin/xcp"
 
-[lilith_packages.main.atuin]
+[lilith_packages.core.atuin]
 source = "apt"
 apt_package = "atuin"
 version = "18.4.0"
@@ -332,7 +332,7 @@ description = "atuin — magical shell history with sync and search"
 upstream = "https://github.com/atuinsh/atuin"
 config = "/etc/skel/.config/atuin/config.toml"
 
-[lilith_packages.main.kibi]
+[lilith_packages.core.kibi]
 source = "wrapper"
 upstream = "https://github.com/ilai-deutel/kibi"
 resolved_url = "https://github.com/ilai-deutel/kibi/releases/latest"
@@ -343,7 +343,7 @@ binary_name = "kibi"
 install_dest = "/usr/local/bin/kibi"
 flatpak_alternative = "com.github.ilai_deutel.kibi"
 
-[lilith_packages.main.czkawka]
+[lilith_packages.core.czkawka]
 source = "wrapper"
 upstream = "https://github.com/qarmin/czkawka"
 resolved_url = "https://github.com/qarmin/czkawka/releases/latest"
@@ -353,7 +353,7 @@ install_method = "binary"
 binary_name = "czkawka"
 install_dest = "/usr/local/bin/czkawka"
 
-[lilith_packages.main.simplemoji]
+[lilith_packages.core.simplemoji]
 source = "wrapper"
 upstream = "https://github.com/SergioRibera/Simplemoji"
 installer = "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/SergioRibera/Simplemoji/releases/download/v1.2.4/simplemoji-installer.sh | sh"
@@ -363,7 +363,7 @@ install_method = "binary"
 binary_name = "simplemoji"
 install_dest = "/usr/local/bin/simplemoji"
 
-[lilith_packages.main.uutils-coreutils]
+[lilith_packages.core.uutils-coreutils]
 source = "wrapper"
 upstream = "https://github.com/uutils/coreutils"
 version = "0.0.30"
@@ -372,7 +372,7 @@ install_method = "wrapper-script"
 wrapper_script = "/usr/local/bin/uutils-wrapper.sh"
 note = "Seamless fallback wrapper — calls uutils binary with GNU coreutils compatibility"
 
-[lilith_packages.main.uutils-findutils]
+[lilith_packages.core.uutils-findutils]
 source = "wrapper"
 upstream = "https://github.com/uutils/findutils"
 version = "0.0.6"
@@ -381,7 +381,7 @@ install_method = "cargo-install"
 binary_name = "uu-find"
 note = "Optional — GNU findutils used by default"
 
-[lilith_packages.main.uutils-util-linux]
+[lilith_packages.core.uutils-util-linux]
 source = "wrapper"
 upstream = "https://github.com/uutils/util-linux"
 version = "0.0.4"
@@ -389,7 +389,7 @@ description = "uutils util-linux — Rust reimplementation of util-linux tools"
 install_method = "cargo-install"
 note = "Optional — system util-linux used by default"
 
-[lilith_packages.main.shred-rust]
+[lilith_packages.core.shred-rust]
 source = "wrapper"
 upstream = "https://github.com/JuanJMarques/shred-rust"
 version = "1.0.0"
@@ -398,7 +398,7 @@ install_method = "cargo-install"
 binary_name = "shred"
 install_dest = "/usr/local/bin/shred"
 
-[lilith_packages.main.soar]
+[lilith_packages.core.soar]
 source = "wrapper"
 upstream = "https://github.com/pkgforge/soar"
 installer = "curl -fsSL https://raw.githubusercontent.com/pkgforge/soar/main/install.sh | sh"
@@ -407,7 +407,7 @@ description = "soar — fast distro-agnostic package manager (SAB format)"
 install_method = "installer-script"
 install_dest = "/usr/local/bin/soar"
 
-[lilith_packages.main.astral-uv]
+[lilith_packages.core.astral-uv]
 source = "wrapper"
 upstream = "https://github.com/astral-sh/uv"
 resolved_url = "https://github.com/astral-sh/uv/releases/latest"
@@ -419,7 +419,7 @@ binary_name = "uv"
 install_dest = "/usr/local/bin/uv"
 also_installs = "uvx"
 
-[lilith_packages.main.pacstall-wrapper]
+[lilith_packages.core.pacstall-wrapper]
 source = "wrapper"
 upstream = "https://github.com/pacstall/pacstall"
 installer = "sudo bash -c \"$(curl -fsSL https://pacstall.dev/q/install)\""
@@ -428,7 +428,7 @@ description = "pacstall — AUR-inspired package manager for Ubuntu"
 install_method = "installer-script"
 install_dest = "/usr/bin/pacstall"
 
-[lilith_packages.main.gemini-cli]
+[lilith_packages.core.gemini-cli]
 source = "wrapper"
 upstream = "https://github.com/google-gemini/gemini-cli"
 npm_package = "@google/gemini-cli"
@@ -439,7 +439,7 @@ binary_name = "gemini"
 install_dest = "/usr/local/bin/gemini"
 depends = ["nodejs", "npm"]
 
-[lilith_packages.main.fluent-icon-theme-installer]
+[lilith_packages.core.fluent-icon-theme-installer]
 source = "wrapper"
 upstream = "https://github.com/vinceliuice/Fluent-icon-theme"
 version = "2024.11.19"
@@ -448,14 +448,14 @@ install_method = "git-install"
 install_script = "git clone https://github.com/vinceliuice/Fluent-icon-theme.git /tmp/Fluent-icon-theme && /tmp/Fluent-icon-theme/install.sh -d /usr/share/icons"
 install_dest = "/usr/share/icons/Fluent-dark"
 
-[lilith_packages.main.noto-color-emoji]
+[lilith_packages.core.noto-color-emoji]
 source = "apt"
 apt_package = "fonts-noto-color-emoji"
 version = "2.047"
 description = "Noto Color Emoji font (Google)"
 upstream = "https://fonts.google.com/noto/specimen/Noto+Color+Emoji"
 
-[lilith_packages.main.flatpak]
+[lilith_packages.core.flatpak]
 source = "apt"
 apt_package = "flatpak"
 version = "1.15.10"
@@ -463,13 +463,13 @@ description = "Flatpak application sandboxing and distribution framework"
 also_install = ["gnome-software-plugin-flatpak"]
 flatpak_remotes = ["flathub:https://dl.flathub.org/repo/flathub.flatpakrepo"]
 
-[lilith_packages.main.libfuse2t64]
+[lilith_packages.core.libfuse2t64]
 source = "apt"
 apt_package = "libfuse2t64"
 version = "2.9.9"
 description = "FUSE 2 shared library — required for AppImage execution"
 
-[lilith_packages.main.pling-store-wrapper]
+[lilith_packages.core.pling-store-wrapper]
 source = "wrapper"
 upstream = "https://www.pling.com/p/1880633/"
 resolved_url = "https://ocs-dl.fra1.cdn.digitaloceanspaces.com/data/files/1673754093/pling-store-5.0.2-1-x86-64.AppImage"
@@ -479,7 +479,7 @@ install_method = "appimage"
 install_dest = "/opt/pling-store"
 depends = ["libfuse2t64"]
 
-[lilith_packages.main.script-kit-wrapper]
+[lilith_packages.core.script-kit-wrapper]
 source = "wrapper"
 upstream = "https://github.com/johnlindquist/kit"
 resolved_url = "https://github.com/johnlindquist/kit/releases/download/v3.45.1/Script-Kit-Linux-3.45.1-x86_64.AppImage"
@@ -489,7 +489,7 @@ install_method = "appimage"
 install_dest = "/opt/script-kit"
 depends = ["libfuse2t64"]
 
-[lilith_packages.main.cosmic-uniform-glass-theme-installer]
+[lilith_packages.core.cosmic-uniform-glass-theme-installer]
 source = "wrapper"
 upstream = "https://github.com/xarbit/cosmic-uniform-glass-theme"
 version = "1.0.0"
@@ -499,7 +499,7 @@ install_script = "git clone https://github.com/xarbit/cosmic-uniform-glass-theme
 install_dest = "/usr/share/cosmic/themes/cosmic-uniform-glass-theme"
 
 # COSMIC Desktop extras (from lil-core.txt cosmic-utils collection)
-[lilith_packages.main.cosmic-app-hub]
+[lilith_packages.core.cosmic-app-hub]
 source = "wrapper"
 upstream = "https://github.com/cosmic-utils/app-hub"
 version = "0.1.0"
@@ -507,7 +507,7 @@ description = "COSMIC App Hub — discover and install COSMIC apps"
 install_method = "cosmic-ppa-or-cargo"
 note = "Install via ppa:hepp3n/cosmic-epoch or cargo build"
 
-[lilith_packages.main.cosmic-clipboard-manager]
+[lilith_packages.core.cosmic-clipboard-manager]
 source = "wrapper"
 upstream = "https://github.com/cosmic-utils/clipboard-manager"
 version = "0.1.0"
@@ -515,35 +515,35 @@ description = "COSMIC Clipboard Manager applet"
 install_method = "cosmic-ppa-or-cargo"
 note = "Install via ppa:hepp3n/cosmic-epoch if available"
 
-[lilith_packages.main.cosmic-color-picker]
+[lilith_packages.core.cosmic-color-picker]
 source = "wrapper"
 upstream = "https://github.com/PixelDoted/cosmic-color-picker"
 version = "0.1.0"
 description = "COSMIC Color Picker utility"
 install_method = "cosmic-ppa-or-cargo"
 
-[lilith_packages.main.cosmicding]
+[lilith_packages.core.cosmicding]
 source = "wrapper"
 upstream = "https://github.com/vkhitrin/cosmicding"
 version = "0.2.1"
 description = "cosmicding — Linkding bookmarks client for COSMIC Desktop"
 install_method = "cosmic-ppa-or-cargo"
 
-[lilith_packages.main.cosmic-forecast]
+[lilith_packages.core.cosmic-forecast]
 source = "wrapper"
 upstream = "https://github.com/cosmic-utils/forecast"
 version = "0.1.0"
 description = "Forecast — weather app for COSMIC Desktop"
 install_method = "cosmic-ppa-or-cargo"
 
-[lilith_packages.main.cosmic-wizard]
+[lilith_packages.core.cosmic-wizard]
 source = "wrapper"
 upstream = "https://github.com/cosmic-utils/wizard"
 version = "0.1.0"
 description = "COSMIC Wizard — first-run setup wizard"
 install_method = "cosmic-ppa-or-cargo"
 
-[lilith_packages.main.lilith-grub-theme]
+[lilith_packages.core.lilith-grub-theme]
 source = "local"
 version = "1.0.0"
 description = "Custom grub2 bootloader theme for Lilith Linux (bundled offline)"
