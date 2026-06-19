@@ -47,6 +47,26 @@ def get_sha256(filepath):
             h.update(chunk)
     return h.hexdigest()
 
+def get_latest_github_release_url(repo: str, asset_name_substr: str, fallback_url: str) -> str:
+    """
+    Resolve the download URL of the latest GitHub release asset whose name
+    contains *asset_name_substr*.  Falls back to *fallback_url* on any error.
+    """
+    try:
+        api_url = f"https://api.github.com/repos/{repo}/releases/latest"
+        req = urllib.request.Request(api_url, headers={"Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read())
+        for asset in data.get("assets", []):
+            if asset_name_substr in asset["name"]:
+                url = asset["browser_download_url"]
+                print(f"  [github] Resolved latest {repo} asset: {asset['name']}")
+                return url
+        print(f"  [github] No matching asset for '{asset_name_substr}' in latest {repo} — using fallback")
+    except Exception as e:
+        print(f"  [github] Could not resolve latest {repo} release ({e}) — using fallback")
+    return fallback_url
+
 def run_cmd(cmd, cwd=None, check=False):
     res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd)
     if res.returncode != 0:
@@ -315,7 +335,9 @@ def main():
     deb_redirects = [
         ("offerings",  "https://github.com/BlancoBAM/Offerings/releases/download/v1.1.0/offerings_1.0.2-beta-1_amd64.deb"),
         ("tweakers",   "https://github.com/BlancoBAM/Tweakers/releases/download/v1.0.1/tweakers-v1.0.1-amd64.deb"),
-        ("lilim",      "https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb"),
+        ("lilim",      get_latest_github_release_url(
+                            "BlancoBAM/Lilim", "_amd64.deb",
+                            "https://github.com/BlancoBAM/Lilim/releases/download/build-31/lilim_0.1.0_amd64.deb")),
         ("stake",      "https://github.com/BlancoBAM/Stake/releases/download/v0.2.3/stake-v0.2.3-amd64.deb"),
         ("ouija-pad",  "https://github.com/BlancoBAM/Ouija-Pad/releases/download/v1.1.0/ouija-pad_1.1.0_amd64.deb"),
         ("topgrade",   "https://github.com/topgrade-rs/topgrade/releases/download/v17.5.0/topgrade_17.5.0_amd64.deb"),
